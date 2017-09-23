@@ -1,5 +1,11 @@
+# Vim swap files
+*.swp
+
+
+
 # Prerequisites
 *.d
+*.dep
 
 # Object files
 *.o
