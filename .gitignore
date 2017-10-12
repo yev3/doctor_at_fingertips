@@ -3,6 +3,18 @@
 **/settings/*
 **/Debug/*
 
+# These are personalized files or something like that, so should not
+# commit every time, they are generated
+*.dep
+*.ewt
+
+# vim undo files
+*.un~
+
+# merge leftovers
+*.orig
+
+
 # C-dev files
 #######################################################################
 
