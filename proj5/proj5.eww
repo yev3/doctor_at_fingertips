@@ -4,7 +4,7 @@
         <path>$WS_DIR$\..\common\include\driverlib\driverlib-cm3.ewp</path>
     </project>
     <project>
-        <path>$WS_DIR$\proj5-comms.ewp</path>
+        <path>$WS_DIR$\proj5.ewp</path>
     </project>
     <batchBuild />
 </workspace>
