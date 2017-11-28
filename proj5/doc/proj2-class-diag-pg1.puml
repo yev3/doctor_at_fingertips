@@ -1,0 +1,56 @@
+@startuml
+
+hide empty members
+skinparam defaultFontName "Lucida Console"
+
+class TaskSchedulerTCB {
+  {field} pData : void*
+  {field} pTask : void (*)(void*)
+  void delay100ms()
+}
+
+class MeasureTCB {
+  {field} pTask : void (*)(void*)
+  pData : void*
+}
+
+class ComputeTCB {
+  {field} pTask : void (*)(void*)
+  pData : void*
+}
+
+class TaskSchedulerData << (S,#FF7700) struct >>{
+  tasks         : TaskControlBlock[]
+  tasksCount    : int
+  scheduledTask : TaskControlBlock*
+}
+
+class MeasureData << (S,#FF7700) struct >>{
+  rawTemp           : unsigned int*
+  rawSystolicPress  : unsigned int*
+  rawDiastolicPress : unsigned int*
+  rawPulseRate      : unsigned int*
+}
+
+class ComputeData << (S,#FF7700) struct >>{
+  ..Raw Task Input Values..
+  rawTemp           : unsigned int*
+  rawSystolicPress  : unsigned int*
+  rawDiastolicPress : unsigned int*
+  rawPulseRate      : unsigned int*
+  batteryState      : unsigned short*
+  ..Corrected Values..
+  correctedTemp           : float*
+  correctedSystolicPress  : float*
+  correctedDiastolicPress : float*
+  correctedPulseRate      : float*
+  batteryPercentage       : float*
+}
+
+TaskSchedulerTCB --> TaskSchedulerData : uses
+MeasureTCB --> MeasureData : uses
+ComputeTCB --> ComputeData : uses
+
+'skinparam linetype ortho
+
+@enduml

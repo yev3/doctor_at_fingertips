@@ -1,0 +1,86 @@
+@startuml
+'scale 600 width
+
+skinparam defaultFontName "Lucida Console"
+'skinparam linetype ortho
+'hide empty members
+'skinparam defaultTextAlignment center
+
+
+
+[*] -> NO_ALARM : Initialize Alarms
+state NO_ALARM {
+  [*] --> LED0_SOLID
+  LED0_SOLID : Solid Green
+  ||
+  [*] --> LED1_OFF
+  LED1_OFF : Turned Off
+  ||
+  [*] --> LED2_OFF
+  LED2_OFF : Turned Off
+  ||
+  [*] --> SPKR_OFF
+  SPKR_OFF : Turned Off
+}
+
+
+NO_ALARM --down--> HAS_ALARM : Any Alarm
+HAS_ALARM --up--> NO_ALARM : All Alarms Cleared
+state HAS_ALARM {
+  LED0_OFF: Turned Off
+  LED0_1SEC: Flash 1 Sec
+  LED0_2SEC: Flash 2 Sec
+
+  [*] -down-> LED0_OFF
+  LED0_OFF -down-> LED0_2SEC : Pulse Warn
+  LED0_OFF -down-> LED0_1SEC : Temp Warn
+  LED0_2SEC -right-> LED0_1SEC : Temp Warn
+}
+
+
+HAS_ALARM -down-> SYSTOLIC_HIGH : Syst High
+state SYSTOLIC_HIGH {
+  state SYST_SPKR_OFF as "SPKR_OFF"
+  SYST_SPKR_OFF : Sound Off
+  SPKR_ON : Beep 1 Sec
+  SPKR_SILENCED : Temp Silenced
+
+  [*] -down-> SPKR_ON
+  SPKR_ON -down-> SPKR_SILENCED : Acknowledge
+  SPKR_ON -right-> SYST_SPKR_OFF : Syst Normal
+  SPKR_SILENCED -up-> SPKR_ON : 5 X Syst High
+  SPKR_SILENCED -right-> SYST_SPKR_OFF : Syst Normal
+  SYST_SPKR_OFF -up-> HAS_ALARM
+
+}
+
+HAS_ALARM -right-> BATT_WARN : Batt Low
+state BATT_WARN {
+  state BATT_WARN_LED2_OFF as "LED2_OFF"
+  BATT_WARN_LED2_OFF : Led 2 Off
+  LED2_1SEC: Led 2 Sec
+
+  [*] -> LED2_1SEC
+  LED2_1SEC -> BATT_WARN_LED2_OFF : Batt OK
+  BATT_WARN_LED2_OFF -> HAS_ALARM
+}
+
+
+HAS_ALARM -right-> PRESSURE_WARN : Press Warn
+state PRESSURE_WARN {
+  state PRESS_LED1_OFF as "LED1_OFF"
+  PRESS_LED1_OFF: Led 1 Off
+  LED1_0.5SEC : Led 1/2 Sec
+
+  [*] -right-> LED1_0.5SEC
+  LED1_0.5SEC -right-> PRESS_LED1_OFF : Press Normal
+  PRESS_LED1_OFF --> HAS_ALARM
+}
+
+
+
+
+
+
+
+@enduml

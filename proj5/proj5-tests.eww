@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace>
+    <project>
+        <path>$WS_DIR$\..\..\..\common\driverlib\driverlib-cm3.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\task_compute\test_compute_task.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\task_hardware_announce\test_hardware_announce.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\task_keyscan\test_keypad_task.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\task_measure\test_measure_task.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\task_pulse_driver\test_pulse_driver.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\task_timings\test_task_timings.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\tick_interrupt\test_tick_interrupt.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\task_warning\test_warning_task.ewp</path>
+    </project>
+    <batchBuild />
+</workspace>

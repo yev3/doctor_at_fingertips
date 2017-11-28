@@ -1,0 +1,12 @@
+@startuml
+(*)  --> "Initialize"
+-->"Get scheduled task"
+If "Task is scheduled?" then
+    --> [Yes] "run scheduled task"
+    --> "delay"
+else
+    -->"delay"
+
+Endif
+-->"Get scheduled task"
+@enduml
