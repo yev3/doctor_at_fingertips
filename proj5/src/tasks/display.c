@@ -24,7 +24,7 @@
 // This is free and unencumbered software released into the public domain.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "system_tasks.h"
+#include "tasks/system.h"
 #include "utils/lcd_print.h"
 
 #pragma clang diagnostic push
@@ -101,7 +101,7 @@ void display(void *rawData) {
       lcd_print("%");
     }
 
-    taskSuspend(TCB_DISPLAY);
+    vTaskSuspend(NULL);
   }
 }
 #pragma clang diagnostic pop

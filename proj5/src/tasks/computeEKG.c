@@ -11,8 +11,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <math.h>
-#include "system_tasks.h"
 #include "utils/optfft.h"
+#include "tasks/system.h"
 
 /**
  * \brief When available, the ComputeEKG task will take the data acquired by
@@ -36,8 +36,8 @@ void computeEKG(void* rawData) {
       // and start again
       *data->completedEKGMeasure = false;
       vTaskDelay(pdMS_TO_TICKS(5000));
-      taskScheduleForExec(TCB_MEASURE_EKG);
-      taskSuspend(TCB_COMPUTE_EKG);
+      taskScheduleForExec(sysTCB_MEAS_EKG);
+      vTaskSuspend(NULL);
     }
   }
 }

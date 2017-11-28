@@ -13,8 +13,8 @@
 
 /* FreeRTOS includes. */
 #include <FreeRTOS.h>
-#include <task_commands.h>
-#include <system_tasks.h>
+#include <tasks/commands.h>
+#include <tasks/system.h>
 #include "task.h"
 
 /* Demo application includes. */
@@ -41,6 +41,11 @@ int main(void) {
   initVarsAndTasks();
 
   initializeNetwork();
+
+  // TODO: remove when changes merged
+  taskSuspend(sysTCB_MEAS_EKG);
+  taskSuspend(sysTCB_COMP_EKG);
+  
 
   // Start the RTOS scheduler.
   FreeRTOS_debug_printf(("vTaskStartScheduler\n"));

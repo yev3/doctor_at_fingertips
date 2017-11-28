@@ -17,10 +17,9 @@
 #include "inc/hw_types.h"
 #include <driverlib/gpio.h>
 #include <driverlib/sysctl.h>
-#include <system_tasks.h>
 #include "utils/uartstdio.h"
 #include "utils/float_print.h"
-#include "system_tasks.h"
+#include "tasks/system.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
@@ -104,7 +103,7 @@ void serial_comms(void *rawData) {
 #undef D
 
     // Prevent this task from running again. It is scheduled as needed.
-    taskSuspend(TCB_SERIAL);
+    taskSuspend(sysTCB_SERIAL);
 //    vTaskDelay(pdMS_TO_TICKS(1));
   }
 }

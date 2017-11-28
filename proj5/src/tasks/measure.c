@@ -13,7 +13,7 @@
 #include <assert.h>
 #include "drivers/pulse_transducer.h"
 #include "driverlib/adc.h"
-#include "system_tasks.h"
+#include "tasks/system.h"
 
 /*******************************************************************************
  * Initialization of Temperature Sensor
@@ -277,8 +277,8 @@ void measure(void *rawData) {
     // and schedule the compute task. Otherwise, this method will keep being
     // scheduled for execution
     if (measurementComplete) {
-      taskScheduleForExec(TCB_COMPUTE);
-      taskSuspend(TCB_MEASURE);
+      taskScheduleForExec(sysTCB_COMPUTE);
+      vTaskSuspend(NULL);
     }
 
 //    vTaskDelay(pdMS_TO_TICKS(1));

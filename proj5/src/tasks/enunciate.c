@@ -17,7 +17,7 @@
 #include <driverlib/interrupt.h>
 #include <driverlib/sysctl.h>
 #include <driverlib/timer.h>
-#include "system_tasks.h"
+#include "tasks/system.h"
 #include "ranges.h"
 #include "inc/lm3s8962.h"
 #include "types.h"
@@ -360,7 +360,7 @@ void updateHardwareStateFrom(EnunciateData *data) {
     updateCurrentAlarmState(data);
     // Information is output to the serial communications port when any
     // alarms are active
-    taskScheduleForExec(TCB_SERIAL);
+    taskScheduleForExec(sysTCB_SERIAL);
   } else {
     // When no alarm is present, unset the active flag and reset state
     aState.alarmIsActive = false;
@@ -415,7 +415,7 @@ void enunciate(void *rawData) {
     updateHardwareStateFrom(data);
 
     // Prevent this task from running unless scheduled by other tasks
-    taskSuspend(TCB_ENUNCIATE);
+    vTaskSuspend(NULL);
 //    vTaskDelay(pdMS_TO_TICKS(5));
   }
 }

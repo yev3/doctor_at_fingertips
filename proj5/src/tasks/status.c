@@ -9,7 +9,7 @@
 // This is free and unencumbered software released into the public domain.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "system_tasks.h"
+#include "tasks/system.h"
 
 /**
  * \brief Adjusts the status of the raw battery values.
@@ -25,7 +25,7 @@ void status(void *rawData) {
     if (*data->batteryState > 0) --*data->batteryState;
 
     //schedule the compute task to update the battery
-    taskScheduleForExec(TCB_COMPUTE);
+    taskScheduleForExec(sysTCB_COMPUTE);
     vTaskDelay(pdMS_TO_TICKS(5000));
   }
 }

@@ -15,30 +15,62 @@
 #include "task.h"
 #include "utils/lcd_print.h"
 
+// @formatter:off
 /******************************************************************************
  * Declarations of TCB structures, allocations, and initialization routines
  ******************************************************************************/
-// @formatter:off
 
 /**
  * \brief Task names that are statically allocated in the system.
  */
 typedef enum {
-  TCB_NAME_BEGIN = 0,   ///< First task in the enumeration array
-  TCB_MEASURE    = 0,   ///< MEASURE index location
-  TCB_COMPUTE    = 1,   ///< COMPUTE index location
-  TCB_DISPLAY    = 2,   ///< DISPLAY index location
-  TCB_ENUNCIATE  = 3,   ///< ENUNCIATE index location
-  TCB_STATUS     = 4,   ///< STATUS index location
-  TCB_KEYSCAN    = 5,   ///< KEY SCAN index location
-  TCB_CONTROLLER = 6,   ///< CONTROLLER index location
-  TCB_SERIAL     = 7,   ///< SERIAL COMMS index location
-  TCB_MEASURE_EKG = 8,  ///< EKG MEASURE index location
-  TCB_COMPUTE_EKG = 9,  ///< EKG COMPUTE index location
-  TCB_NAME_END    = 10, ///< Last task+1 in the enumeration array
-//  TCB_IDLE        = 10, ///< FreeRTOS IDLE Task index location
-//  TCB_TIMER       = 11, ///< FreeRTOS TIMER Task index location
+  sysTCB_MEASURE     = 0,   ///< MEASURE 
+  sysTCB_COMPUTE     = 1,   ///< COMPUTE 
+  sysTCB_DISPLAY     = 2,   ///< DISPLAY 
+  sysTCB_ENUNCIATE   = 3,   ///< ENUNCIATE 
+  sysTCB_STATUS      = 4,   ///< STATUS 
+  sysTCB_KEYSCAN     = 5,   ///< KEY SCAN 
+  sysTCB_CONTROLLER  = 6,   ///< CONTROLLER 
+  sysTCB_SERIAL      = 7,   ///< SERIAL COMMS 
+  sysTCB_MEAS_EKG    = 8,  ///< EKG MEASURE 
+  sysTCB_COMP_EKG    = 9,  ///< EKG COMPUTE 
 } TaskNameEnum_t;
+
+#define sysTASK_COUNT (sysTCB_COMP_EKG + 1)
+
+/*
+ * Priorities above idle for tasks
+ */
+#define sysPRI_MEAS  3
+#define sysPRI_COMP  3
+#define sysPRI_DISP  3
+#define sysPRI_ENUN  3
+#define sysPRI_STAT  3
+#define sysPRI_KEYS  3
+#define sysPRI_CONT  3
+#define sysPRI_SERL  3
+#define sysPRI_MEKG  3
+#define sysPRI_CEKG  3
+
+/*
+ * Stack sizes
+ */
+#define sysSTK_MEAS configMINIMAL_STACK_SIZE
+#define sysSTK_COMP configMINIMAL_STACK_SIZE
+#define sysSTK_DISP configMINIMAL_STACK_SIZE
+#define sysSTK_ENUN configMINIMAL_STACK_SIZE
+#define sysSTK_STAT configMINIMAL_STACK_SIZE
+#define sysSTK_KEYS configMINIMAL_STACK_SIZE
+#define sysSTK_CONT configMINIMAL_STACK_SIZE
+#define sysSTK_SERL configMINIMAL_STACK_SIZE 
+#define sysSTK_MEKG configMINIMAL_STACK_SIZE
+#define sysSTK_CEKG configMINIMAL_STACK_SIZE
+
+#define sysSTK_TOTAL (sysSTK_MEAS + sysSTK_COMP + sysSTK_DISP + \
+                      sysSTK_ENUN + sysSTK_STAT + sysSTK_KEYS + \
+                      sysSTK_CONT + sysSTK_SERL + sysSTK_MEKG + \
+                      sysSTK_CEKG)
+
 
 /**
  * \brief User's measurement selection values

@@ -17,7 +17,7 @@
 #include <driverlib/sysctl.h>
 #include <driverlib/timer.h>
 #include <math.h>
-#include "system_tasks.h"
+#include "tasks/system.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
@@ -82,8 +82,8 @@ void measureEKG(void* rawData) {
     *data->completedEKGMeasure = true;
     // when done measuring, call ComputeEKG to get frequency
     if(*data->completedEKGMeasure) {
-      taskScheduleForExec(TCB_COMPUTE_EKG);
-      taskSuspend(TCB_MEASURE_EKG);
+      taskScheduleForExec(sysTCB_COMP_EKG);
+      vTaskSuspend(NULL);
     }
   }
 }

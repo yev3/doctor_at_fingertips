@@ -14,9 +14,7 @@
 #include <driverlib/sysctl.h>
 #include <driverlib/gpio.h>
 #include <stdint.h>
-#include "system_tasks.h"
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
+#include "tasks/system.h"
 /******************************************************************************
  * Button state    0 - Up
  *                 1 - Down
@@ -79,8 +77,7 @@ void key_scan(void *rawData) {
     data->keyPressedSelect = HWREGBITB(&buttonsChangedDown, 4);
 
     // Schedule the controller to respond to key presses
-    if (data->keyAvailable) taskScheduleForExec(TCB_CONTROLLER);
+    if (data->keyAvailable) taskScheduleForExec(sysTCB_CONTROLLER);
     vTaskDelay(pdMS_TO_TICKS(5));
   }
 }
-#pragma clang diagnostic pop

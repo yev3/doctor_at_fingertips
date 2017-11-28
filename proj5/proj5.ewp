@@ -1116,6 +1116,9 @@
             <name>$PROJ_DIR$\src\tasks\enunciate.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\src\tasks\init.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\src\tasks\ipconn.c</name>
         </file>
         <file>
@@ -1132,9 +1135,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\src\tasks\status.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\src\tasks\system_tasks.c</name>
         </file>
     </group>
     <group>

@@ -28,7 +28,8 @@
 #include "queue.h"
 
 #include "FreeRTOS_IP.h"
-#include "task_commands.h"
+#include "tasks/system.h"
+#include "tasks/commands.h"
 
 static TaskHandle_t dispatchTaskHandle = NULL;
 static QueueHandle_t cmdQueue = NULL;

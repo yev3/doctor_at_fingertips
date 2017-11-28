@@ -7,9 +7,9 @@
 #include <inc/hw_types.h>
 #include <driverlib/flash.h>
 #include <utils/sockcmdline.h>
-#include <task_commands.h>
 #include "utils/ustdlib.h"
 #include "utils/uartstdio.h"
+#include "tasks/system.h"
 
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
@@ -19,6 +19,7 @@
 /* FreeRTOS+TCP includes. */
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_Sockets.h"
+#include "tasks/commands.h"
 
 /* The maximum time to wait for a closing socket to close. */
 #define ipconnSHUTDOWN_DELAY  ( pdMS_TO_TICKS( 5000 ) )

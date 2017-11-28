@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C686325E-3261-42F7-AEB1-DDE5280E1CEB}</ProjectGuid>
-    <ProjectName>RTOSDemo</ProjectName>
+    <ProjectName>proj5</ProjectName>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -221,13 +221,13 @@
     <ClCompile Include="src\tasks\controller.c" />
     <ClCompile Include="src\tasks\display.c" />
     <ClCompile Include="src\tasks\enunciate.c" />
+    <ClCompile Include="src\tasks\init.c" />
     <ClCompile Include="src\tasks\ipconn.c" />
     <ClCompile Include="src\tasks\key_scan.c" />
     <ClCompile Include="src\tasks\measure.c" />
     <ClCompile Include="src\tasks\measureEKG.c" />
     <ClCompile Include="src\tasks\serial_comms.c" />
     <ClCompile Include="src\tasks\status.c" />
-    <ClCompile Include="src\tasks\system_tasks.c" />
     <ClCompile Include="src\utils\float_print.c" />
     <ClCompile Include="src\utils\hardware_timer.c" />
     <ClCompile Include="src\utils\lcd_print.c" />
@@ -422,8 +422,8 @@
     <ClInclude Include="include\ranges.h" />
     <ClInclude Include="include\RTOSDebugTrace.h" />
     <ClInclude Include="include\RTOSIPTrace.h" />
-    <ClInclude Include="include\system_tasks.h" />
-    <ClInclude Include="include\task_commands.h" />
+    <ClInclude Include="include\tasks\commands.h" />
+    <ClInclude Include="include\tasks\system.h" />
     <ClInclude Include="include\types.h" />
     <ClInclude Include="include\utils\float_print.h" />
     <ClInclude Include="include\utils\hardware_timer.h" />

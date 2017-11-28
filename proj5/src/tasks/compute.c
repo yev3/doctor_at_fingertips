@@ -10,7 +10,7 @@
 // This is free and unencumbered software released into the public domain.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "system_tasks.h"
+#include "tasks/system.h"
 #include "ranges.h"
 #include "drivers/pulse_transducer.h"
 
@@ -54,9 +54,9 @@ void compute(void *rawData) {
             ((float) *data->batteryState) * 100.0f / (float) BATT_FULL_CHARGE;
 
     // suspend compute task in schedule and schedule display task
-    taskScheduleForExec(TCB_ENUNCIATE);
-    taskScheduleForExec(TCB_DISPLAY);
-    taskSuspend(TCB_COMPUTE);
+    taskScheduleForExec(sysTCB_ENUNCIATE);
+    taskScheduleForExec(sysTCB_DISPLAY);
+    vTaskSuspend(NULL);
   }
 }
 #pragma clang diagnostic pop

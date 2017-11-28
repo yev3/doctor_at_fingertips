@@ -13,10 +13,8 @@
  *****************************************************************************/
 
 #include <utils/lcd_print.h>
-#include "system_tasks.h"
+#include "tasks/system.h"
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
 #define NSCROLL 3   /* Number of items available in the menu */
 
 /**
@@ -34,7 +32,7 @@ void ui_controller(void *rawData) {
       // Silence the alarm when the user presses the silence key
       if (keys->keyPressedLeft) {
         *data->auralAlarmSilenced = true;
-        taskScheduleForExec(TCB_ENUNCIATE);
+        taskScheduleForExec(sysTCB_ENUNCIATE);
       }
 
       // Mode selection is toggled by the right key
@@ -75,7 +73,7 @@ void ui_controller(void *rawData) {
           *data->mode = ENUNCIATE_DISP_MODE;
 
           //schedule measure task when a measurement is chosen
-          taskScheduleForExec(TCB_MEASURE);
+          taskScheduleForExec(sysTCB_MEASURE);
         }
 
       } else {
@@ -83,12 +81,10 @@ void ui_controller(void *rawData) {
       }
 
       // User pressed a key, so update the display
-      taskScheduleForExec(TCB_DISPLAY);
+      taskScheduleForExec(sysTCB_DISPLAY);
     }
 
     // Suspend controller task in schedule
-    taskSuspend(TCB_CONTROLLER);
+    vTaskSuspend(NULL);
   }
 }
-
-#pragma clang diagnostic pop
