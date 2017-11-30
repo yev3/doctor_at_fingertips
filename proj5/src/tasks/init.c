@@ -16,6 +16,7 @@
 #include "utils/led_control.h"
 #include "utils/speaker_control.h"
 #include "drivers/pulse_transducer.h"
+#include "tasks/commands.h"
 
 /*****************************************************************************
  * Global variable declaration section. Declared static on purpose to allow
@@ -48,10 +49,9 @@ static WarningAlarmStates warningAlarmStates = { 0 };
 /*
  * User interface controller state
  */
-static int scrollPosn = 0;                    ///< current scroll position
-static MeasureSelection measureSelection = MEASURE_PRESSURE; ///< cur measure
+static QueueHandle_t keyPressQueue;           ///< Queue of the pressed keys
 static bool auralAlarmSilenced = false;       ///< when true, alarm silenced
-static DisplayMode displayMode = MENU_DISP_MODE;     ///< Current display mode
+static MeasureSelection measureSelection = MEASURE_PRESSURE; ///< cur measure
 
 /*
  * EKG measurements and flag when measurement completes
@@ -60,19 +60,36 @@ static EKGBuffer ekgBuffer;               ///< buffer holding EKG measurements
 static bool completedEKGMeasure = false;  ///< flag when measurement is done
 
 /*****************************************************************************
+ * Initialize static queues
+ *****************************************************************************/
+
+static StaticQueue_t queueKeysStatic;
+static uint8_t queueKeysStaticStorage[sysKEY_QUEUE_LEN * sizeof(KeyPress_t)];
+
+void initStaticQueues() {
+
+  keyPressQueue = xQueueCreateStatic(sysKEY_QUEUE_LEN,
+                                     sizeof(KeyPress_t),
+                                     queueKeysStaticStorage,
+                                     &queueKeysStatic);
+  configASSERT(keyPressQueue);
+}
+
+
+/*****************************************************************************
  * Task shared data declarations section.
  *****************************************************************************/
 
 static MeasureData measureData        = {0};  ///< measure task data
 static ComputeData computeData        = {0};  ///< compute task data
-static DisplayViewModel displayData   = {0};  ///< display task data
+static DispViewModel_t dispviewModel  = {0};  ///< UI model state
+static DisplayData displayData        = {0};  ///< display task data
 static EnunciateData enunciateData    = {0};  ///< compute task data
 static StatusData statusData          = {0};  ///< status task data
-static KeyScanData keyScanData        = {0};  ///< key scan task data
 static ControllerData controllerData  = {0};  ///< ui controller task data
 static SerialCommData serialData      = {0};  ///< ui controller task data
-static MeasureEKGData measEKGData  = {0};  ///< EKG measure task data
-static ComputeEKGData compEKGData  = {0};  ///< EKG compute task data
+static MeasureEKGData measEKGData     = {0};  ///< EKG measure task data
+static ComputeEKGData compEKGData     = {0};  ///< EKG compute task data
 
 /*****************************************************************************
  * Forward declarations of the external routines and initialization functions
@@ -95,6 +112,7 @@ extern void computeEKG(void *rawData);
  *****************************************************************************/
 
 TaskHandle_t taskHandles[sysTASK_COUNT];
+
 static StaticTask_t taskBlockBuffers[sysTASK_COUNT];
 static StackType_t taskStackBuffers[sysSTK_TOTAL];
 
@@ -118,12 +136,14 @@ TE(sysTCB_COMPUTE   , compute,       computeData,    sysPRI_COMP, sysSTK_COMP),
 TE(sysTCB_DISPLAY   , display,       displayData,    sysPRI_DISP, sysSTK_DISP),
 TE(sysTCB_ENUNCIATE , enunciate,     enunciateData,  sysPRI_ENUN, sysSTK_ENUN),
 TE(sysTCB_STATUS    , status,        statusData,     sysPRI_STAT, sysSTK_STAT),
-TE(sysTCB_KEYSCAN   , key_scan,      keyScanData,    sysPRI_KEYS, sysSTK_KEYS),
+TE(sysTCB_KEYSCAN   , key_scan,      keyPressQueue,  sysPRI_KEYS, sysSTK_KEYS),
 TE(sysTCB_CONTROLLER, ui_controller, controllerData, sysPRI_CONT, sysSTK_CONT),
 TE(sysTCB_SERIAL    , serial_comms,  serialData,     sysPRI_SERL, sysSTK_SERL),
 TE(sysTCB_MEAS_EKG  , measureEKG,    measEKGData,    sysPRI_MEKG, sysSTK_MEKG),
 TE(sysTCB_COMP_EKG  , computeEKG,    compEKGData,    sysPRI_CEKG, sysSTK_CEKG),
 };
+
+#undef TE
 
 #define initNUM_STATIC_TASKS (sizeof(taskEntries) / sizeof(TCBStaticEntry_t))
 
@@ -145,7 +165,6 @@ void initStaticTCBs() {
   }
 }
 
-#undef TE
 
 /*
  * Static memory for the system tasks
@@ -234,12 +253,17 @@ void globalVarsAndBuffersInit() {
     .measurementSelection = &measureSelection,
   };
 
+  // Display View model initialization
+  dispviewModel = (DispViewModel_t) {
+    .mode = MENU_DISP_MODE,
+    .scrollPosn = 0,
+  };
+
   // Initialize the display data pointers
-  displayData = (DisplayViewModel) {
+  displayData = (DisplayData) {
     .correctedBuffers = &correctedBuffers,
     .batteryPercentage =&batteryPercentage,
-    .mode = &displayMode,
-    .scrollPosn = &scrollPosn,
+    .viewModel = &dispviewModel,
   };
 
   // Initialize the warning data pointers
@@ -256,11 +280,10 @@ void globalVarsAndBuffersInit() {
 
   // Initialize the ui controller data pointers
   controllerData = (ControllerData) {
-    .keyScanData = &keyScanData,
-    .mode = &displayMode,
-    .scrollPosn = &scrollPosn,
+    .keyPressQueueHandle = keyPressQueue,
+    .viewModel = &dispviewModel,
+    .measureSelect = &measureSelection,
     .auralAlarmSilenced = &auralAlarmSilenced,
-    .measurementSelection = &measureSelection,
   };
 
   // Initialize the warning data pointers
@@ -316,10 +339,13 @@ void taskScheduleForExec(TaskNameEnum_t id){
 /**
  * \brief Initializes the task control blocks and global variables
  */
-void initVarsAndTasks() {
+void initVarsTasksQueues() {
   static bool runOnce = true; ///< ensures that this method runs only once
   if (runOnce) {
     runOnce = false;
+    
+    // Initialize statically-allocated Queues
+    initStaticQueues();
 
     // Initialize the global variable links among tasks
     globalVarsAndBuffersInit();

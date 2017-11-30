@@ -385,6 +385,25 @@ available in all the FreeRTOS+TCP source files. */
 #include "RTOSIPTrace.h"
 #include "RTOSDebugTrace.h"
 
+////////////////////////////////////////////////////////////////////////////////
+// START WINDOWS SIMULATOR SETTINGS SECTION
+////////////////////////////////////////////////////////////////////////////////
+#define configNETWORK_INTERFACE_TO_USE 2UL
+
+/* Default netmask configuration.  Used in ipconfigUSE_DNS is set to 0, or
+ipconfigUSE_DNS is set to 1 but a DNS server cannot be contacted. */
+#define configNET_MASK0		255
+#define configNET_MASK1		255
+#define configNET_MASK2		0
+#define configNET_MASK3		0
+
+/* Only used when running in the FreeRTOS Windows simulator.  Defines the
+priority of the task used to simulate Ethernet interrupts. */
+#define configMAC_ISR_SIMULATOR_PRIORITY	( configMAX_PRIORITIES - 1 )
+
+////////////////////////////////////////////////////////////////////////////////
+// END WINDOWS SIMULATOR SETTINGS SECTION
+////////////////////////////////////////////////////////////////////////////////
 
 #ifdef __cplusplus
 } /* extern "C" */

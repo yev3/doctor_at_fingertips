@@ -15,6 +15,7 @@
 #include <driverlib/gpio.h>
 #include <stdint.h>
 #include "tasks/system.h"
+#include "tasks/commands.h"
 /******************************************************************************
  * Button state    0 - Up
  *                 1 - Down
@@ -45,14 +46,28 @@ void keypad_init() {
                    GPIO_PIN_TYPE_STD_WPU);
 }
 
+/*
+ * Queue to send the key strokes to, initialized on task start
+ */
+static QueueHandle_t keyQueue;
+
+/**
+ * \brief Helper to send a key stroke
+ * \param key Key press to enqueue
+ */
+void keyPress(KeyPress_t key) {
+  // Does not wait when the queue is full, just disregard the key
+  xQueueSend(keyQueue, &key, 0);  
+}
+
 /**
  * \brief Scans and debounces key presses and updates new key press flags
  * \param rawData raw data passed by the task scheduler
  */
-void key_scan(void *rawData) {
-  for(;;) {
-    KeyScanData *data = (KeyScanData *) rawData;
+void key_scan(void *taskArg) {
+  keyQueue = *(QueueHandle_t*) taskArg;
 
+  for(;;) {
     // raw key states read from ports
     uchar keyRead = (uchar)(
             (GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_1) << 3) |
@@ -69,15 +84,14 @@ void key_scan(void *rawData) {
                                  ~keyState & ((1 << 5) - 1));
 
     // Update the key state variables
-    data->keyAvailable = buttonsChangedDown > 0;
-    data->keyPressedUp = HWREGBITB(&buttonsChangedDown, 0);
-    data->keyPressedDown = HWREGBITB(&buttonsChangedDown, 1);
-    data->keyPressedLeft = HWREGBITB(&buttonsChangedDown, 2);
-    data->keyPressedRight = HWREGBITB(&buttonsChangedDown, 3);
-    data->keyPressedSelect = HWREGBITB(&buttonsChangedDown, 4);
+    if (buttonsChangedDown > 0) {
+      if(HWREGBITB(&buttonsChangedDown, 0)) keyPress(cmdKEY_UP);
+      if(HWREGBITB(&buttonsChangedDown, 1)) keyPress(cmdKEY_DOWN);
+      if(HWREGBITB(&buttonsChangedDown, 2)) keyPress(cmdKEY_LEFT);
+      if(HWREGBITB(&buttonsChangedDown, 3)) keyPress(cmdKEY_RIGHT);
+      if(HWREGBITB(&buttonsChangedDown, 4)) keyPress(cmdKEY_SELECT);
+    }
 
-    // Schedule the controller to respond to key presses
-    if (data->keyAvailable) taskScheduleForExec(sysTCB_CONTROLLER);
     vTaskDelay(pdMS_TO_TICKS(5));
   }
 }

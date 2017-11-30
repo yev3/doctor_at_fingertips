@@ -198,9 +198,6 @@
     <ClCompile Include="..\common\include\utils\softssi.c">
       <Filter>deps\sysutils</Filter>
     </ClCompile>
-    <ClCompile Include="src\utils\RTOSDebugTrace.c">
-      <Filter>deps</Filter>
-    </ClCompile>
     <ClCompile Include="src\utils\RTOSIPTrace.c">
       <Filter>deps</Filter>
     </ClCompile>
@@ -220,15 +217,6 @@
       <Filter>deps\FreeRTOS</Filter>
     </ClCompile>
     <ClCompile Include="..\common\FreeRTOS\Source\event_groups.c">
-      <Filter>deps\FreeRTOS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\FreeRTOS\Source\portable\Common\mpu_wrappers.c">
-      <Filter>deps\FreeRTOS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\FreeRTOS\Source\portable\MSVC-MingW\port.c">
-      <Filter>deps\FreeRTOS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\FreeRTOS\Source\portable\MemMang\heap_4.c">
       <Filter>deps\FreeRTOS</Filter>
     </ClCompile>
     <ClCompile Include="..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\FreeRTOS_Sockets.c">
@@ -258,9 +246,6 @@
     <ClCompile Include="..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\FreeRTOS_IP.c">
       <Filter>deps\FreeRTOS-TCP</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\BufferManagement\BufferAllocation_2.c">
-      <Filter>deps\FreeRTOS-TCP</Filter>
-    </ClCompile>
     <ClCompile Include="src\utils\tables.c">
       <Filter>utils</Filter>
     </ClCompile>
@@ -278,6 +263,21 @@
     </ClCompile>
     <ClCompile Include="src\tasks\init.c">
       <Filter>tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\FreeRTOS\Source\portable\MSVC-MingW\port.c">
+      <Filter>deps\FreeRTOS\portable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\FreeRTOS\Source\portable\MemMang\heap_4.c">
+      <Filter>deps\FreeRTOS\portable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\BufferManagement\BufferAllocation_2.c">
+      <Filter>deps\FreeRTOS-TCP\portable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\NetworkInterface\WinPCap\NetworkInterface.c">
+      <Filter>deps\FreeRTOS-TCP\portable</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\RTOSDebugTraceWindows.c">
+      <Filter>deps</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -739,9 +739,6 @@
     <ClInclude Include="..\common\include\inc\c\yvals.h">
       <Filter>deps\sysinc</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\FreeRTOS\Source\portable\MSVC-MingW\portmacro.h">
-      <Filter>deps\FreeRTOS</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\FreeRTOS\Source\include\mpu_wrappers.h">
       <Filter>deps\FreeRTOS\include</Filter>
     </ClInclude>
@@ -783,12 +780,6 @@
     </ClInclude>
     <ClInclude Include="..\common\FreeRTOS\Source\include\mpu_prototypes.h">
       <Filter>deps\FreeRTOS\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC\pack_struct_start.h">
-      <Filter>deps\FreeRTOS-TCP</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC\pack_struct_end.h">
-      <Filter>deps\FreeRTOS-TCP</Filter>
     </ClInclude>
     <ClInclude Include="..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\FreeRTOS_Sockets.h">
       <Filter>deps\FreeRTOS-TCP\include</Filter>
@@ -853,6 +844,15 @@
     <ClInclude Include="include\tasks\commands.h">
       <Filter>includes\tasks</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC\pack_struct_start.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC\pack_struct_end.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\FreeRTOS\Source\portable\MSVC-MingW\portmacro.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="tasks">
@@ -895,13 +895,16 @@
     <Filter Include="includes\tasks">
       <UniqueIdentifier>{6e050bd0-f697-487a-bd27-1945f27dc709}</UniqueIdentifier>
     </Filter>
+    <Filter Include="deps\FreeRTOS\portable">
+      <UniqueIdentifier>{b30b2dc6-da53-4353-a0ff-b4146c88d7f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\FreeRTOS-TCP\portable">
+      <UniqueIdentifier>{44193392-cfc6-4f5b-a143-25462880b7b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\common\include\driverlib\readme.txt">
       <Filter>deps\driverlib</Filter>
-    </Text>
-    <Text Include="..\common\FreeRTOS\Source\readme.txt">
-      <Filter>deps\FreeRTOS</Filter>
     </Text>
   </ItemGroup>
 </Project>

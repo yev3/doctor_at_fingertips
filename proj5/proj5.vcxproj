@@ -52,11 +52,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <IncludePath>$(ProjectDir)include;$(ProjectDir)..\common\include;$(ProjectDir)..\common\FreeRTOS\Source\portable\MSVC-MingW;$(ProjectDir)..\common\FreeRTOS\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\IAR;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include;$(ProjectDir)..\common\include;$(ProjectDir)..\common\FreeRTOS\Source\portable\MSVC-MingW;$(ProjectDir)..\common\FreeRTOS\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\protocols\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\WinPCap;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <IncludePath>$(ProjectDir)include;$(ProjectDir)..\common\include;$(ProjectDir)..\common\FreeRTOS\Source\portable\MSVC-MingW;$(ProjectDir)..\common\FreeRTOS\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\IAR;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include;$(ProjectDir)..\common\include;$(ProjectDir)..\common\FreeRTOS\Source\portable\MSVC-MingW;$(ProjectDir)..\common\FreeRTOS\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\protocols\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\WinPCap;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -66,7 +66,8 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\Source\FreeRTOS-Plus-FAT\include;..\..\Source\FreeRTOS-Plus-FAT\portable\common;..\..\Source\FreeRTOS-Plus-TCP\protocols\include;..\..\Source\FreeRTOS-Plus-TCP\portable\BufferManagement;.\DemoTasks\include;..\..\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC;.\WinPCap;..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\MSVC-MingW;..\..\Source\FreeRTOS-Plus-CLI;.\TraceMacros\Example1;..\..\Source\FreeRTOS-Plus-TCP\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_WIN32_WINNT=0x0500;WINVER=0x400;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -90,14 +91,12 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>.\Debug/RTOSDemo.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\Debug/WIN32.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalDependencies>wpcap.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>.\WinPCap</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\WinPCap</AdditionalLibraryDirectories>
       <Profile>false</Profile>
     </Link>
     <Bscmake>
@@ -124,14 +123,14 @@
       <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalIncludeDirectories>..\Common\Utils;..\Common\ethernet\lwip-1.4.0\ports\win32\WinPCap;..\Common\ethernet\lwip-1.4.0\src\include\ipv4;..\Common\ethernet\lwip-1.4.0\src\include;..\..\Source\include;..\..\Source\portable\MSVC-MingW;..\Common\ethernet\lwip-1.4.0\ports\win32\include;..\Common\Include;.\lwIP_Apps;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>.\Release/RTOSDemo.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ProgramDatabaseFile>.\Release/WIN32.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -155,66 +154,167 @@
     <ClCompile Include="..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\FreeRTOS_TCP_WIN.c" />
     <ClCompile Include="..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\FreeRTOS_UDP_IP.c" />
     <ClCompile Include="..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\BufferManagement\BufferAllocation_2.c" />
+    <ClCompile Include="..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\NetworkInterface\WinPCap\NetworkInterface.c" />
     <ClCompile Include="..\common\FreeRTOS\Source\croutine.c" />
     <ClCompile Include="..\common\FreeRTOS\Source\event_groups.c" />
     <ClCompile Include="..\common\FreeRTOS\Source\list.c" />
-    <ClCompile Include="..\common\FreeRTOS\Source\portable\Common\mpu_wrappers.c" />
     <ClCompile Include="..\common\FreeRTOS\Source\portable\MemMang\heap_4.c" />
     <ClCompile Include="..\common\FreeRTOS\Source\portable\MSVC-MingW\port.c" />
     <ClCompile Include="..\common\FreeRTOS\Source\queue.c" />
     <ClCompile Include="..\common\FreeRTOS\Source\tasks.c" />
     <ClCompile Include="..\common\FreeRTOS\Source\timers.c" />
-    <ClCompile Include="..\common\include\driverlib\adc.c" />
-    <ClCompile Include="..\common\include\driverlib\can.c" />
-    <ClCompile Include="..\common\include\driverlib\comp.c" />
-    <ClCompile Include="..\common\include\driverlib\cpu.c" />
-    <ClCompile Include="..\common\include\driverlib\eeprom.c" />
-    <ClCompile Include="..\common\include\driverlib\epi.c" />
-    <ClCompile Include="..\common\include\driverlib\ethernet.c" />
-    <ClCompile Include="..\common\include\driverlib\fan.c" />
-    <ClCompile Include="..\common\include\driverlib\flash.c" />
-    <ClCompile Include="..\common\include\driverlib\fpu.c" />
-    <ClCompile Include="..\common\include\driverlib\gpio.c" />
-    <ClCompile Include="..\common\include\driverlib\hibernate.c" />
-    <ClCompile Include="..\common\include\driverlib\i2c.c" />
-    <ClCompile Include="..\common\include\driverlib\i2s.c" />
-    <ClCompile Include="..\common\include\driverlib\interrupt.c" />
-    <ClCompile Include="..\common\include\driverlib\lpc.c" />
-    <ClCompile Include="..\common\include\driverlib\mpu.c" />
-    <ClCompile Include="..\common\include\driverlib\peci.c" />
-    <ClCompile Include="..\common\include\driverlib\pwm.c" />
-    <ClCompile Include="..\common\include\driverlib\qei.c" />
-    <ClCompile Include="..\common\include\driverlib\rit128x96x4.c" />
-    <ClCompile Include="..\common\include\driverlib\ssi.c" />
-    <ClCompile Include="..\common\include\driverlib\sysctl.c" />
-    <ClCompile Include="..\common\include\driverlib\sysexc.c" />
-    <ClCompile Include="..\common\include\driverlib\systick.c" />
-    <ClCompile Include="..\common\include\driverlib\timer.c" />
-    <ClCompile Include="..\common\include\driverlib\uart.c" />
-    <ClCompile Include="..\common\include\driverlib\udma.c" />
-    <ClCompile Include="..\common\include\driverlib\usb.c" />
-    <ClCompile Include="..\common\include\driverlib\watchdog.c" />
-    <ClCompile Include="..\common\include\utils\cmdline.c" />
-    <ClCompile Include="..\common\include\utils\cpu_usage.c" />
-    <ClCompile Include="..\common\include\utils\crc.c" />
-    <ClCompile Include="..\common\include\utils\flash_pb.c" />
-    <ClCompile Include="..\common\include\utils\fswrapper.c" />
-    <ClCompile Include="..\common\include\utils\isqrt.c" />
-    <ClCompile Include="..\common\include\utils\locator.c" />
-    <ClCompile Include="..\common\include\utils\lwiplib.c" />
-    <ClCompile Include="..\common\include\utils\ptpdlib.c" />
-    <ClCompile Include="..\common\include\utils\ringbuf.c" />
-    <ClCompile Include="..\common\include\utils\scheduler.c" />
-    <ClCompile Include="..\common\include\utils\sine.c" />
-    <ClCompile Include="..\common\include\utils\softi2c.c" />
-    <ClCompile Include="..\common\include\utils\softssi.c" />
-    <ClCompile Include="..\common\include\utils\softuart.c" />
-    <ClCompile Include="..\common\include\utils\swupdate.c" />
-    <ClCompile Include="..\common\include\utils\tftp.c" />
-    <ClCompile Include="..\common\include\utils\uartstdio.c" />
-    <ClCompile Include="..\common\include\utils\ustdlib.c" />
+    <ClCompile Include="..\common\include\driverlib\adc.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\can.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\comp.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\cpu.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\eeprom.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\epi.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\ethernet.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\fan.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\flash.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\fpu.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\gpio.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\hibernate.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\i2c.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\i2s.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\interrupt.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\lpc.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\mpu.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\peci.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\pwm.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\qei.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\rit128x96x4.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\ssi.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\sysctl.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\sysexc.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\systick.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\timer.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\uart.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\udma.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\usb.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\driverlib\watchdog.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\cmdline.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\cpu_usage.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\crc.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\flash_pb.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\fswrapper.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\isqrt.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\locator.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\lwiplib.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\ptpdlib.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\ringbuf.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\scheduler.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\sine.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\softi2c.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\softssi.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\softuart.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\swupdate.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\tftp.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\uartstdio.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\include\utils\ustdlib.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\main.c" />
-    <ClCompile Include="src\startup_ewarm.c" />
+    <ClCompile Include="src\startup_ewarm.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\tasks\cmd_dispatch.c" />
     <ClCompile Include="src\tasks\compute.c" />
     <ClCompile Include="src\tasks\computeEKG.c" />
@@ -234,7 +334,7 @@
     <ClCompile Include="src\utils\led_control.c" />
     <ClCompile Include="src\utils\optfft.c" />
     <ClCompile Include="src\utils\pulse_transducer.c" />
-    <ClCompile Include="src\utils\RTOSDebugTrace.c" />
+    <ClCompile Include="src\utils\RTOSDebugTraceWindows.c" />
     <ClCompile Include="src\utils\RTOSIPTrace.c" />
     <ClCompile Include="src\utils\sockcmdline.c" />
     <ClCompile Include="src\utils\speaker_control.c" />
@@ -273,41 +373,111 @@
     <ClInclude Include="..\common\FreeRTOS\Source\include\task.h" />
     <ClInclude Include="..\common\FreeRTOS\Source\include\timers.h" />
     <ClInclude Include="..\common\FreeRTOS\Source\portable\MSVC-MingW\portmacro.h" />
-    <ClInclude Include="..\common\include\driverlib\adc.h" />
-    <ClInclude Include="..\common\include\driverlib\can.h" />
-    <ClInclude Include="..\common\include\driverlib\comp.h" />
-    <ClInclude Include="..\common\include\driverlib\cpu.h" />
-    <ClInclude Include="..\common\include\driverlib\debug.h" />
-    <ClInclude Include="..\common\include\driverlib\eeprom.h" />
-    <ClInclude Include="..\common\include\driverlib\epi.h" />
-    <ClInclude Include="..\common\include\driverlib\ethernet.h" />
-    <ClInclude Include="..\common\include\driverlib\fan.h" />
-    <ClInclude Include="..\common\include\driverlib\flash.h" />
-    <ClInclude Include="..\common\include\driverlib\fpu.h" />
-    <ClInclude Include="..\common\include\driverlib\gpio.h" />
-    <ClInclude Include="..\common\include\driverlib\hibernate.h" />
-    <ClInclude Include="..\common\include\driverlib\i2c.h" />
-    <ClInclude Include="..\common\include\driverlib\i2s.h" />
-    <ClInclude Include="..\common\include\driverlib\interrupt.h" />
-    <ClInclude Include="..\common\include\driverlib\lpc.h" />
-    <ClInclude Include="..\common\include\driverlib\mpu.h" />
-    <ClInclude Include="..\common\include\driverlib\peci.h" />
-    <ClInclude Include="..\common\include\driverlib\pin_map.h" />
-    <ClInclude Include="..\common\include\driverlib\pwm.h" />
-    <ClInclude Include="..\common\include\driverlib\qei.h" />
-    <ClInclude Include="..\common\include\driverlib\rit128x96x4.h" />
-    <ClInclude Include="..\common\include\driverlib\rom.h" />
-    <ClInclude Include="..\common\include\driverlib\rom_map.h" />
-    <ClInclude Include="..\common\include\driverlib\rtos_bindings.h" />
-    <ClInclude Include="..\common\include\driverlib\ssi.h" />
-    <ClInclude Include="..\common\include\driverlib\sysctl.h" />
-    <ClInclude Include="..\common\include\driverlib\sysexc.h" />
-    <ClInclude Include="..\common\include\driverlib\systick.h" />
-    <ClInclude Include="..\common\include\driverlib\timer.h" />
-    <ClInclude Include="..\common\include\driverlib\uart.h" />
-    <ClInclude Include="..\common\include\driverlib\udma.h" />
-    <ClInclude Include="..\common\include\driverlib\usb.h" />
-    <ClInclude Include="..\common\include\driverlib\watchdog.h" />
+    <ClInclude Include="..\common\include\driverlib\adc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\can.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\comp.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\cpu.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\debug.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\eeprom.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\epi.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\ethernet.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\fan.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\flash.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\fpu.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\gpio.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\hibernate.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\i2c.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\i2s.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\interrupt.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\lpc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\mpu.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\peci.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\pin_map.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\pwm.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\qei.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\rit128x96x4.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\rom.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\rom_map.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\rtos_bindings.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\ssi.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\sysctl.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\sysexc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\systick.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\timer.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\uart.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\udma.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\usb.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\driverlib\watchdog.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\common\include\inc\asmdefs.h" />
     <ClInclude Include="..\common\include\inc\c\arm_cmse.h" />
     <ClInclude Include="..\common\include\inc\c\arm_interrupt.h" />
@@ -398,25 +568,63 @@
     <ClInclude Include="..\common\include\inc\hw_usb.h" />
     <ClInclude Include="..\common\include\inc\hw_watchdog.h" />
     <ClInclude Include="..\common\include\inc\lm3s8962.h" />
-    <ClInclude Include="..\common\include\utils\cmdline.h" />
-    <ClInclude Include="..\common\include\utils\cpu_usage.h" />
-    <ClInclude Include="..\common\include\utils\crc.h" />
-    <ClInclude Include="..\common\include\utils\flash_pb.h" />
-    <ClInclude Include="..\common\include\utils\fswrapper.h" />
-    <ClInclude Include="..\common\include\utils\isqrt.h" />
-    <ClInclude Include="..\common\include\utils\locator.h" />
-    <ClInclude Include="..\common\include\utils\lwiplib.h" />
-    <ClInclude Include="..\common\include\utils\ptpdlib.h" />
-    <ClInclude Include="..\common\include\utils\ringbuf.h" />
-    <ClInclude Include="..\common\include\utils\scheduler.h" />
-    <ClInclude Include="..\common\include\utils\sine.h" />
-    <ClInclude Include="..\common\include\utils\softi2c.h" />
-    <ClInclude Include="..\common\include\utils\softssi.h" />
-    <ClInclude Include="..\common\include\utils\softuart.h" />
-    <ClInclude Include="..\common\include\utils\swupdate.h" />
-    <ClInclude Include="..\common\include\utils\tftp.h" />
-    <ClInclude Include="..\common\include\utils\uartstdio.h" />
-    <ClInclude Include="..\common\include\utils\ustdlib.h" />
+    <ClInclude Include="..\common\include\utils\cmdline.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\cpu_usage.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\crc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\flash_pb.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\fswrapper.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\isqrt.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\locator.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\lwiplib.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\ptpdlib.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\ringbuf.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\scheduler.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\sine.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\softi2c.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\softssi.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\softuart.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\swupdate.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\tftp.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\uartstdio.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\common\include\utils\ustdlib.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="include\FreeRTOSConfig.h" />
     <ClInclude Include="include\FreeRTOSIPConfig.h" />
     <ClInclude Include="include\ranges.h" />
@@ -435,8 +643,9 @@
     <ClInclude Include="include\utils\speaker_control.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\common\FreeRTOS\Source\readme.txt" />
-    <Text Include="..\common\include\driverlib\readme.txt" />
+    <Text Include="..\common\include\driverlib\readme.txt">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Text>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

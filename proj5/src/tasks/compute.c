@@ -14,8 +14,6 @@
 #include "ranges.h"
 #include "drivers/pulse_transducer.h"
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
 /**
  * \brief When available, the Compute task will take the data acquired by 
  * the Measure task and perform any necessary transformations or corrections.  
@@ -59,4 +57,3 @@ void compute(void *rawData) {
     vTaskSuspend(NULL);
   }
 }
-#pragma clang diagnostic pop

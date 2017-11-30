@@ -13,6 +13,7 @@
 #include "types.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
 #include "utils/lcd_print.h"
 
 // @formatter:off
@@ -66,10 +67,18 @@ typedef enum {
 #define sysSTK_MEKG configMINIMAL_STACK_SIZE
 #define sysSTK_CEKG configMINIMAL_STACK_SIZE
 
+/*
+ * Total amount of stack used by the tasks
+ */
 #define sysSTK_TOTAL (sysSTK_MEAS + sysSTK_COMP + sysSTK_DISP + \
                       sysSTK_ENUN + sysSTK_STAT + sysSTK_KEYS + \
                       sysSTK_CONT + sysSTK_SERL + sysSTK_MEKG + \
                       sysSTK_CEKG)
+
+/*
+ * Length of the key command queue
+ */
+#define sysKEY_QUEUE_LEN 5
 
 
 /**
@@ -87,8 +96,7 @@ typedef enum MeasureSelection_t {
 // @formatter:on
 
 /**
- * \brief Iliffe vector of system TCBs, fully initialized by initTCB() and
- * accessed by the indices defined by TaskName
+ * \brief Task handles of the statically-allocated tasks
  */
 extern TaskHandle_t taskHandles[];
 
@@ -143,7 +151,7 @@ extern void network_init();
 /**
  * \brief Init all global variables, TCB structures & underlying data pointers.
  */
-void initVarsAndTasks();
+void initVarsTasksQueues();
 
 /******************************************************************************
  * Declarations of the scheduling routines
@@ -203,8 +211,8 @@ typedef struct CorrectedBuffers {
 } CorrectedBuffers;
 
 typedef struct EKGBuffer {
-    int ekgMeasures[BUF_SIZE_EKG];      ///< Raw EKG reading buffer
-    uchar ekgIndex;                     ///< Current raw EKG buffer index
+  int ekgMeasures[BUF_SIZE_EKG];  ///< Raw EKG reading buffer
+  uchar ekgIndex;                 ///< Current raw EKG buffer index
 } EKGBuffer;
 
 /**
@@ -269,41 +277,36 @@ typedef struct SerialCommData {
   WarningAlarmStates *warningAlarmStates; ///< Ptr to warnings and alarms
 } SerialCommData;
 
-/**
- * \brief Key scanner data references
- */
-typedef struct KeyScanData {
-  bool keyAvailable;              ///< Indicates new key press occurred
-  bool keyPressedUp;              ///< Indicates a new UP press
-  bool keyPressedDown;            ///< Indicates a new DOWN press
-  bool keyPressedLeft;            ///< Indicates a new LEFT press
-  bool keyPressedRight;           ///< Indicates a new RIGHT press
-  bool keyPressedSelect;          ///< Indicates a new SELECT press
-} KeyScanData;
-
-typedef enum DisplayMode {
+typedef enum DisplayMode_t {
   MENU_DISP_MODE = 0,
   ENUNCIATE_DISP_MODE = 1
 } DisplayMode;
 
+typedef struct DisplayViewModel_t {
+  DisplayMode mode;                  ///< Current display mode
+  int scrollPosn;                    ///< User's current scroll posn
+} DispViewModel_t;
+
 /**
  * \brief DISPLAY data references
  */
-typedef struct DisplayViewModel {
+typedef struct DisplayData {
   CorrectedBuffers *correctedBuffers; ///< Corrected buffers and indices
   float *batteryPercentage;           ///< Current battery percentage
-  DisplayMode *mode;                  ///< Current display mode
-  int *scrollPosn;                    ///< User's current scroll posn
-} DisplayViewModel;
+  DispViewModel_t *viewModel;         ///< Display View Model
+} DisplayData;
 
 /**
  * \brief Holds references to data needed for the controller to operate
  */
 typedef struct ControllerData {
-  KeyScanData *keyScanData;       ///< Key scanner data references
-  DisplayMode *mode;              ///< Current display mode
-  int *scrollPosn;                ///< Current scroll position
-  MeasureSelection *measurementSelection; ///< User's selected measurement
+  QueueHandle_t keyPressQueueHandle;  ///< User's key presses
+  DispViewModel_t *viewModel;         ///< Display View Model
+  MeasureSelection *measureSelect;    ///< User's selected measurement
+
+  // Hook to call when alarm is ACKed
+  // TODO
+
   bool *auralAlarmSilenced;       ///< True when user acknowledges the alarm
 } ControllerData;
 
@@ -318,15 +321,15 @@ typedef struct StatusData {
  * \brief EKGMEASURE data references
  */
 typedef struct MeasureEKGData {
-    EKGBuffer *ekgBuffer;                 ///< Raw circular buffers and indices
-    bool *completedEKGMeasure;            ///< T when measurement is done
+  EKGBuffer *ekgBuffer;                 ///< Raw circular buffers and indices
+  bool *completedEKGMeasure;            ///< T when measurement is done
 } MeasureEKGData;
 
 /**
  * \brief EKGCOMPUTE data references
  */
 typedef struct ComputeEKGData {
-    EKGBuffer *ekgBuffer;                 ///< Raw circular buffers and indices
-    CorrectedBuffers *correctedBuffers;   ///< Raw circular buffers and indices
-    bool *completedEKGMeasure;            ///< F when computation is done
+  EKGBuffer *ekgBuffer;                 ///< Raw circular buffers and indices
+  CorrectedBuffers *correctedBuffers;   ///< Raw circular buffers and indices
+  bool *completedEKGMeasure;            ///< F when computation is done
 } ComputeEKGData;

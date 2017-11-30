@@ -38,7 +38,7 @@ int main(void) {
   initializeHardwarePeriph();
 
   // Initialize system tasks
-  initVarsAndTasks();
+  initVarsTasksQueues();
 
   initializeNetwork();
 

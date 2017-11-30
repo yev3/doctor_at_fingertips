@@ -27,8 +27,6 @@
 #include "tasks/system.h"
 #include "utils/lcd_print.h"
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
 #define MENU_LINE1 " MEASUREMENT SELECT  "
 #define DISP_LINE2 "---------------------"
 #define MENU_LEADR ">>"
@@ -40,35 +38,36 @@
 
 /**
  * \brief Display the measurement values to the user on the LCD
- * \param rawData raw data ptr passed by the task dispatcher
+ * \param taskArg raw data ptr passed by the task dispatcher
  */
-void display(void *rawData) {
+void display(void *taskArg) {
   static DisplayMode lastMode = (DisplayMode) -1;   ///< Last display mode
   static int lastScroll = -1;                       ///< Last scroll posn
 
   // TCB data and buffer
-  DisplayViewModel *data = (DisplayViewModel *) rawData;
+  DisplayData *data = (DisplayData *)taskArg;
+  DispViewModel_t *ui = (DispViewModel_t *)data->viewModel;
   CorrectedBuffers *buf = (CorrectedBuffers *) data->correctedBuffers;
 
   for(;;) {
     // clear the screen if the mode has changed
-    if (lastMode != *data->mode) {
+    if (lastMode != ui->mode) {
       lcd_clear();
       lastScroll = -1;
-      lastMode = *data->mode;
+      lastMode = ui->mode;
     }
 
     int lineno = 0; ///! Current line number being displayed
 
-    if (MENU_DISP_MODE == *data->mode) {
-      if (lastScroll != *data->scrollPosn) {
-        lastScroll = *data->scrollPosn;
+    if (MENU_DISP_MODE == ui->mode) {
+      if (lastScroll != ui->scrollPosn) {
+        lastScroll = ui->scrollPosn;
         lcd_printf_at(lineno++, 0, MENU_LINE1);
         lcd_printf_at(lineno++, 0, DISP_LINE2);
         lcd_printf_at(lineno++, 0, MENU_LINE3);
         lcd_printf_at(lineno++, 0, MENU_LINE4);
         lcd_printf_at(lineno++, 0, MENU_LINE5);
-        lcd_printf_at(2 + *data->scrollPosn, 0, MENU_LEADR);
+        lcd_printf_at(2 + ui->scrollPosn, 0, MENU_LEADR);
       }
     } else {
       // Enunciate mode
@@ -104,4 +103,3 @@ void display(void *rawData) {
     vTaskSuspend(NULL);
   }
 }
-#pragma clang diagnostic pop

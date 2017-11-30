@@ -18,6 +18,14 @@
 #include <stdbool.h>
 
 typedef enum {
+  cmdKEY_UP,
+  cmdKEY_DOWN,
+  cmdKEY_LEFT,
+  cmdKEY_RIGHT,
+  cmdKEY_SELECT,
+} KeyPress_t;
+
+typedef enum {
   SCMD_RESET_NETWORK,
   SCMD_START,
   SCMD_STOP,

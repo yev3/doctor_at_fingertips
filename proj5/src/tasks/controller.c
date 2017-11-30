@@ -14,6 +14,8 @@
 
 #include <utils/lcd_print.h>
 #include "tasks/system.h"
+#include "tasks/commands.h"
+#include "FreeRTOS_IP.h"
 
 #define NSCROLL 3   /* Number of items available in the menu */
 
@@ -24,53 +26,55 @@
  */
 void ui_controller(void *rawData) {
   ControllerData *data = (ControllerData *) rawData;
-  KeyScanData *keys = data->keyScanData;
+  QueueHandle_t keyPresses = data->keyPressQueueHandle;
+  DispViewModel_t *ui = data->viewModel;
+  KeyPress_t key;
 
   for(;;) {
-    // Only take an action if a key is pressed
-    if (keys->keyAvailable) {
+    if (xQueueReceive(keyPresses, &key, portMAX_DELAY) == pdPASS) {
       // Silence the alarm when the user presses the silence key
-      if (keys->keyPressedLeft) {
+      if (cmdKEY_LEFT == key) {
         *data->auralAlarmSilenced = true;
         taskScheduleForExec(sysTCB_ENUNCIATE);
       }
 
       // Mode selection is toggled by the right key
-      if (keys->keyPressedRight) {
-        *data->mode =
-                (MENU_DISP_MODE == *data->mode) ? ENUNCIATE_DISP_MODE : MENU_DISP_MODE;
+      if (cmdKEY_RIGHT == key) {
+        ui->mode = (MENU_DISP_MODE == ui->mode)
+                          ? ENUNCIATE_DISP_MODE
+                          : MENU_DISP_MODE;
       }
 
-      if (MENU_DISP_MODE == *data->mode) {
+      if (MENU_DISP_MODE == ui->mode) {
         // Menu mode
 
         // Scroll up when the up key is pressed
-        if (keys->keyPressedUp && (*data->scrollPosn > 0)) {
-          --(*data->scrollPosn);
+        if (cmdKEY_UP == key && (ui->scrollPosn > 0)) {
+          --(ui->scrollPosn);
         }
 
         // Scroll down when the down key is pressed
-        if (keys->keyPressedDown && (*data->scrollPosn < (NSCROLL - 1))) {
-          ++(*data->scrollPosn);
+        if (cmdKEY_DOWN == key && (ui->scrollPosn < (NSCROLL - 1))) {
+          ++(ui->scrollPosn);
         }
 
-        if (keys->keyPressedSelect) {
-          switch (*data->scrollPosn) {
-            case 0 :
-              *data->measurementSelection = MEASURE_PRESSURE;
-              break;
-            case 1 :
-              *data->measurementSelection = MEASURE_TEMPERATURE;
-              break;
-            case 2 :
-              *data->measurementSelection = MEASURE_PULSE;
-              break;
-            default:
-              break;
+        if (cmdKEY_SELECT == key) {
+          switch (ui->scrollPosn) {
+          case 0:
+            *data->measureSelect = MEASURE_PRESSURE;
+            break;
+          case 1:
+            *data->measureSelect = MEASURE_TEMPERATURE;
+            break;
+          case 2:
+            *data->measureSelect = MEASURE_PULSE;
+            break;
+          default:
+            break;
           }
 
           // place into enunciate mode after measurement was selected
-          *data->mode = ENUNCIATE_DISP_MODE;
+          ui->mode = ENUNCIATE_DISP_MODE;
 
           //schedule measure task when a measurement is chosen
           taskScheduleForExec(sysTCB_MEASURE);
@@ -82,9 +86,9 @@ void ui_controller(void *rawData) {
 
       // User pressed a key, so update the display
       taskScheduleForExec(sysTCB_DISPLAY);
-    }
 
-    // Suspend controller task in schedule
-    vTaskSuspend(NULL);
+    } else {
+      FreeRTOS_debug_printf(("Unable to read from the key queue, even after blocking"));
+    }
   }
 }
