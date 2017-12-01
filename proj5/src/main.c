@@ -42,17 +42,19 @@ int main(void) {
 
   initializeNetwork();
 
-  // TODO: remove when changes merged
+  //// TODO: remove when changes merged
   taskSuspend(sysTCB_MEAS_EKG);
   taskSuspend(sysTCB_COMP_EKG);
   
-
   // Start the RTOS scheduler.
   FreeRTOS_debug_printf(("vTaskStartScheduler\n"));
   vTaskStartScheduler();
 
   for (;;) {
     // Should never reach
+#ifdef WIN32
+    Sleep(pdMS_TO_TICKS(1000UL));
+#endif
   }
 }
 /*-----------------------------------------------------------*/

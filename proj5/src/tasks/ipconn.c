@@ -5,11 +5,11 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <inc/hw_types.h>
-#include <driverlib/flash.h>
 #include <utils/sockcmdline.h>
 #include "utils/ustdlib.h"
 #include "utils/uartstdio.h"
 #include "tasks/system.h"
+#include "hardware_port.h"
 
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
@@ -77,36 +77,15 @@ static void prvSRand(UBaseType_t ulSeed);
  */
 void StartTCPListeningTask(uint16_t usStackSize, UBaseType_t uxPriority);
 
+extern void NetworkGetMAC(uint8_t *ucMACAddress);
 
 // Initializes the network stack
 void network_init() {
   // Seed random number
   prvSRand((uint32_t)37);
 
-  // Configure the hardware MAC address for Ethernet Controller
-  // filtering of incoming packets.
-  //
-  // For the LM3S6965 Evaluation Kit, the MAC address will be stored in the
-  // non-volatile USER0 and USER1 registers.  These registers can be read
-  // using the FlashUserGet function, as illustrated below.
-  unsigned long ulUser0, ulUser1;
-  FlashUserGet(&ulUser0, &ulUser1);
-
-  //
-  // Convert the 24/24 split MAC address from NV ram into a 32/16 split
-  // MAC address needed to program the hardware registers, then program
-  // the MAC address into the Ethernet Controller registers.
-  //
-  ucMACAddress[0] = ((ulUser0 >> 0) & 0xff);
-  ucMACAddress[1] = ((ulUser0 >> 8) & 0xff);
-  ucMACAddress[2] = ((ulUser0 >> 16) & 0xff);
-  ucMACAddress[3] = ((ulUser1 >> 0) & 0xff);
-  ucMACAddress[4] = ((ulUser1 >> 8) & 0xff);
-  ucMACAddress[5] = ((ulUser1 >> 16) & 0xff);
-
-  char *a = (char *)ucMACAddress;
-  FreeRTOS_debug_printf(("Using MAC %02X:%02X:%02X:%02X:%02X:%02X\n",
-    a[0], a[1], a[2], a[3], a[4], a[5]));
+  // Initialize the mac address
+  NetworkGetMAC(ucMACAddress);
 
   FreeRTOS_IPInit(ucIPAddress, ucNetMask, ucGatewayAddress,
     ucDNSServerAddress, ucMACAddress);
@@ -489,7 +468,7 @@ static void prvServerConnectionInstance(void *pvParameters) {
       lTotalSent = 0;
 
       outBuf.buf[outBuf.capacity - 1] = '\0';
-      UARTprintf("Sending back:\n%s\n", outBuf.buf);
+      FreeRTOS_debug_printf(("Sending back:\n%s\n", outBuf.buf));
 
       /* Call send() until all the data has been sent. */
       while ((lSent >= 0) && (lTotalSent < outBuf.len)) {

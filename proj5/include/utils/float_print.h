@@ -14,6 +14,7 @@
 #include <math.h>
 #include "types.h"
 #include "utils/ustdlib.h"
+#include "hardware_port.h"
 
 /**
  * \brief Prints a formatted floating point number to the buffer, to overcome

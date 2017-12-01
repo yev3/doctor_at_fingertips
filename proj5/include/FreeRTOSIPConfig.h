@@ -86,9 +86,13 @@ extern "C" {
 on).  Valid options are pdFREERTOS_BIG_ENDIAN and pdFREERTOS_LITTLE_ENDIAN. */
 #define ipconfigBYTE_ORDER pdFREERTOS_LITTLE_ENDIAN
 
-/* The checksums will be checked and calculated by the STM32F4x ETH peripheral. */
+// Calculation of the IP checksums
 #define ipconfigDRIVER_INCLUDED_TX_IP_CHECKSUM		( 0 )
 #define ipconfigDRIVER_INCLUDED_RX_IP_CHECKSUM		( 0 )
+
+#ifdef WIN32
+#define ipconfigDRIVER_INCLUDED_RX_IP_CHECKSUM		( 1 )
+#endif
 
 /* Several API's will block until the result is known, or the action has been
 performed, for example FreeRTOS_send() and FreeRTOS_recv().  The timeouts can be
@@ -302,7 +306,7 @@ filtering can be removed by using a value other than 1 or 0. */
 
 /* The windows simulator cannot really simulate MAC interrupts, and needs to
 block occasionally to allow other tasks to run. */
-#define configWINDOWS_MAC_INTERRUPT_SIMULATOR_DELAY ( 2 / portTICK_PERIOD_MS )
+#define configWINDOWS_MAC_INTERRUPT_SIMULATOR_DELAY ( 20 / portTICK_PERIOD_MS )
 
 /* Advanced only: in order to access 32-bit fields in the IP packets with
 32-bit memory instructions, all packets will be stored 32-bit-aligned, plus

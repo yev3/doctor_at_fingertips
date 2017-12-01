@@ -27,24 +27,6 @@
 static uchar buttonsChangedDown = 0x00; ///< Bitpacked btn changed down state
 static uint32_t keyState = 0;           ///< Bit-shifted state used to debounce
 
-/**
- * \brief Initializes the hardware peripherals needed to read the keypad
- */
-void keypad_init() {
-  // Enable the peripherals used by the application.
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-
-  // Configure the GPIOs used to read the state of the on-board push buttons.
-  GPIOPinTypeGPIOInput(GPIO_PORTE_BASE,
-                       GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
-  GPIOPadConfigSet(GPIO_PORTE_BASE,
-                   GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3,
-                   GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
-  GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_1);
-  GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_STRENGTH_2MA,
-                   GPIO_PIN_TYPE_STD_WPU);
-}
 
 /*
  * Queue to send the key strokes to, initialized on task start

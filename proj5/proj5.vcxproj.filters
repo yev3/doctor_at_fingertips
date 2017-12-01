@@ -27,9 +27,6 @@
     <ClCompile Include="src\utils\led_control.c">
       <Filter>utils</Filter>
     </ClCompile>
-    <ClCompile Include="src\utils\hardware_timer.c">
-      <Filter>utils</Filter>
-    </ClCompile>
     <ClCompile Include="src\tasks\key_scan.c">
       <Filter>tasks</Filter>
     </ClCompile>
@@ -279,6 +276,14 @@
     <ClCompile Include="src\utils\RTOSDebugTraceWindows.c">
       <Filter>deps</Filter>
     </ClCompile>
+    <ClCompile Include="src\utils\hardware_timer.c">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="hardware_port.c">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\windows_port.c" />
+    <ClCompile Include="src\hardware_port.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FreeRTOSConfig.h" />
@@ -852,6 +857,9 @@
     </ClInclude>
     <ClInclude Include="..\common\FreeRTOS\Source\portable\MSVC-MingW\portmacro.h">
       <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\hardware_port.h">
+      <Filter>includes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
