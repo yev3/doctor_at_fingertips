@@ -1,0 +1,59 @@
+@startuml
+
+hide empty members
+skinparam defaultFontName "Lucida Console"
+
+class DisplayTCB {
+  {field} pTask : void (*)(void*)
+  pData : void*
+}
+
+class EnunciateTCB {
+  {field} pTask : void (*)(void*)
+  pData : void*
+}
+
+class StatusTCB {
+  {field} pTask : void (*)(void*)
+  pData : void*
+}
+
+class DisplayData << (S,#FF7700) struct >>{
+  ..Corrected Task Input Values..
+  correctedTemp           : float*
+  correctedSystolicPress  : float*
+  correctedDiastolicPress : float*
+  correctedPulseRate      : float*
+  batteryPercentage       : float*
+}
+
+class WarningAlarmData << (S,#FF7700) struct >>{
+  ..Corrected Task Input Values..
+  correctedTemp           : float*
+  correctedSystolicPress  : float*
+  correctedDiastolicPress : float*
+  correctedPulseRate      : float*
+  batteryPercentage       : float*
+  ..Alarm Task Outputs..
+  bpOutOfRange    : bool*
+  tempOutOfRange  : bool*
+  pulseOutOfRange : bool*
+  ..Warning Task Outputs..
+  bpHighAlarm     : bool*
+  tempHighAlarm   : bool*
+  pulseLowAlarm   : bool*
+  battLowAlarm    : bool*
+}
+
+class StatusData  << (S,#FF7700) struct >>{
+  ushort *batteryState;
+}
+
+DisplayTCB --> DisplayData : uses
+EnunciateTCB --> WarningAlarmData : uses
+StatusTCB --> StatusData : uses
+
+
+'skinparam linetype ortho
+
+@enduml
