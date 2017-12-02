@@ -1155,6 +1155,9 @@
             <name>$PROJ_DIR$\src\utils\optfft.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\src\utils\pressure_cuff.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\src\utils\pulse_transducer.c</name>
         </file>
         <file>

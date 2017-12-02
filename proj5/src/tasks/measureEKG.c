@@ -21,47 +21,7 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
-#define PI 3.1417f
-
-static float ekgMeasurement = 0;
-static ulong ticks = 0;
-
-
-/**
- * \brief Handler for simulated EKG measurements. It uses a sinusoidal sensor output.
- */
-void Timer2IntHandler() {
-  TimerIntClear(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
-  ticks ++;
-
-}
-/**
- * \brief Initialization of EKG measurement timer interrupt.
- */
-void measure_ekg_init() {
-  // Get the number of system time cycles (not ticks) for one sys tick
-  ulong sysTickPeriod = SysCtlClockGet();
-
-  // Enable the timer peripheral
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER2);
-
-  // Enable processor interrupts.
-  IntMasterEnable();
-
-  // Configure 32-bit periodic timer.
-  TimerConfigure(TIMER2_BASE,  TIMER_CFG_32_BIT_PER);
-  TimerLoadSet(TIMER2_BASE, TIMER_A, sysTickPeriod);
-
-  // Load the next timer period
-  Timer2IntHandler();
-
-  // Setup the interrupt for the timer timeout.
-  IntEnable(INT_TIMER2A);
-  TimerIntEnable(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
-
-  // Enable the timer.
-  TimerEnable(TIMER2_BASE, TIMER_A);
-}
+#define PI 3.14159265354f
 
 /**
  * \brief The MeasureEKG task will measure the current EKG measurement that is
@@ -79,12 +39,9 @@ void measureEKG(void* rawData) {
       ekgBuffer->ekgMeasures[i] = (int)(30.0*sin(w*t));
       t += 0.000125;
     }
-    *data->completedEKGMeasure = true;
     // when done measuring, call ComputeEKG to get frequency
-    if(*data->completedEKGMeasure) {
-      taskScheduleForExec(sysTCB_COMP_EKG);
-      vTaskSuspend(NULL);
-    }
+    taskScheduleForExec(sysTCB_COMP_EKG);
+    vTaskSuspend(NULL);
   }
 }
 #pragma clang diagnostic pop

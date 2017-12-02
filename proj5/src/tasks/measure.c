@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include "drivers/pulse_transducer.h"
+#include "drivers/pressure_cuff.h"
 #include "driverlib/adc.h"
 #include "tasks/system.h"
 
@@ -150,47 +151,33 @@ uint genDiastP(uint p) {
  * \return True when completed
  */
 bool processPressureMeasure(MeasureData *measureData, RawBuffers *buf) {
-  static const uint RESET_VAL = 80;             ///< reset point of sensor
+  //check if pressure can be measured
+  if(beginPressureMeasurement && (measureSystolic || measureDiastolic)) {
+    // determine the old and new array indices in the buffer
+    uint oldSysIdx = buf->pressureIndex;
+    uint newSysIdx = (oldSysIdx + 1) % BUF_SIZE;
+    uint oldDiaIdx = oldSysIdx + BUF_SIZE;
+    uint newDiaIdx = newSysIdx + BUF_SIZE;
 
-  // determine the old and new array indices in the buffer
-  uint oldSysIdx = buf->pressureIndex;
-  uint newSysIdx = (oldSysIdx + 1) % BUF_SIZE;
-  uint oldDiaIdx = oldSysIdx + BUF_SIZE;
-  uint newDiaIdx = newSysIdx + BUF_SIZE;
-
-  // update the last written circ buffer index
-  buf->pressureIndex = (uchar) newSysIdx;
-
-  // Check the case when last measurement marked completion of both types of pr
-  if (*measureData->completedSystolic && *measureData->completedDiastolic) {
-    // starting new cycle of measure, so both completion flags are unmarked
-    *measureData->completedSystolic = false;
-    *measureData->completedDiastolic = false;
-    // finish the method by setting the new sys and dias buffers to reset values
-    buf->pressures[newSysIdx] = RESET_VAL;
-    buf->pressures[newDiaIdx] = RESET_VAL;
-  } else {
-    // generate the next pressure value from old pressure value
-    if (!*measureData->completedSystolic) {
-      buf->pressures[newSysIdx] = genSystP(buf->pressures[oldSysIdx]);
+    // update the last written circ buffer index
+    buf->pressureIndex = (uchar) newSysIdx;
+    float *pressure = GetPressure();
+    // measure Systolic pressure when ready
+    if (measureSystolic) {
+      buf->pressures[newSysIdx] = *pressure;
       buf->pressures[newDiaIdx] = buf->pressures[oldDiaIdx];
-
-      // When the pressure sensor > 100 units, mark completed systolic flag
-      if (buf->pressures[newSysIdx] > 100) {
-        *measureData->completedSystolic = true;
-      }
-    } else {
-      buf->pressures[newSysIdx] = buf->pressures[oldSysIdx];
-      buf->pressures[newDiaIdx] = genDiastP(buf->pressures[oldDiaIdx]);
-
-      // When the pressure sensor falls below 40 units, set the completed flag
-      if (buf->pressures[newDiaIdx] < 40) {
-        *measureData->completedDiastolic = true;
-      }
+      measureSystolic = false;
     }
+      // measure Diastolic pressure when ready
+    else if (measureDiastolic) {
+      buf->pressures[newSysIdx] = buf->pressures[oldSysIdx];
+      buf->pressures[newDiaIdx] = *pressure;
+      measureDiastolic = false;
+    }
+    beginPressureMeasurement = false;
   }
 
-  return *measureData->completedSystolic && *measureData->completedDiastolic;
+  return true;
 }
 
 /******************************************************************************

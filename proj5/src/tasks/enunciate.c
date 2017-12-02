@@ -24,6 +24,7 @@
 #include "utils/led_control.h"
 #include "utils/speaker_control.h"
 #include "utils/hardware_timer.h"
+#include "drivers/pressure_cuff.h"
 
 /******************************************************************************
  *
@@ -48,7 +49,8 @@ bool pSysNormal(const float *pSys) {
  * @return true if the pressure is >20% above accepted limit
  */
 bool pSysHighAlarm(const float *pSys) {
-  return (*pSys >= SYS_PRESS_NORMAL_MAX * 1.2f);
+  float pressure = 9 + 2.0f * (*GetPressure());
+  return ( pressure >= SYS_PRESS_NORMAL_MAX * 1.2f);
 }
 
 /**

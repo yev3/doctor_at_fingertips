@@ -58,7 +58,7 @@ FreeRTOSConfig.h as it is a demo application constant. */
 /*
  * Network Configuration Parameters
  */
-static const uint8_t ucIPAddress[4] = { 192, 168, 1, 10 };
+static const uint8_t ucIPAddress[4] = { 169, 254, 163, 6 };
 static const uint8_t ucNetMask[4] = { 255, 255, 255, 0 };
 static const uint8_t ucGatewayAddress[4] = { 192, 168, 1, 254 };
 static const uint8_t ucDNSServerAddress[4] = { 208, 67, 222, 222 };

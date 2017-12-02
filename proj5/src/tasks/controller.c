@@ -15,7 +15,7 @@
 #include <utils/lcd_print.h>
 #include "tasks/system.h"
 
-#define NSCROLL 3   /* Number of items available in the menu */
+#define NSCROLL 4   /* Number of items available in the menu */
 
 /**
  * \brief Processes key presses or other user input and takes appropriate
@@ -58,12 +58,20 @@ void ui_controller(void *rawData) {
           switch (*data->scrollPosn) {
             case 0 :
               *data->measurementSelection = MEASURE_PRESSURE;
+              *data->cuffControl = true;
+              ResetPressure();
               break;
             case 1 :
               *data->measurementSelection = MEASURE_TEMPERATURE;
+              *data->cuffControl = false;
               break;
             case 2 :
               *data->measurementSelection = MEASURE_PULSE;
+              *data->cuffControl = false;
+              break;
+            case 3 :
+              *data->measurementSelection = MEASURE_EKG;
+              *data->cuffControl = false;
               break;
             default:
               break;
@@ -72,12 +80,32 @@ void ui_controller(void *rawData) {
           // place into enunciate mode after measurement was selected
           *data->mode = ENUNCIATE_DISP_MODE;
 
+          //schedule measure EKG task when EKG is chosen
+          if(MEASURE_EKG == *data->measurementSelection)
+            taskScheduleForExec(sysTCB_MEAS_EKG);
           //schedule measure task when a measurement is chosen
-          taskScheduleForExec(sysTCB_MEASURE);
+          else
+            taskScheduleForExec(sysTCB_MEASURE);
         }
 
       } else {
         // Enunciate mode
+        // Increase Pressure when the up key is pressed
+        if (keys->keyPressedUp && *data->cuffControl) {
+          IncreasePressure();
+
+          //schedule measure task when pressure changes
+          *data->measurementSelection = MEASURE_PRESSURE;
+          taskScheduleForExec(sysTCB_MEASURE);
+        }
+
+        // Decrease pressure when the down key is pressed
+        if (keys->keyPressedDown && *data->cuffControl) {
+          DecreasePressure();
+          //schedule measure task when pressure changes
+          *data->measurementSelection = MEASURE_PRESSURE;
+          taskScheduleForExec(sysTCB_MEASURE);
+        }
       }
 
       // User pressed a key, so update the display

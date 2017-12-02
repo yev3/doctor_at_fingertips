@@ -64,7 +64,7 @@ typedef enum {
 #define sysSTK_CONT configMINIMAL_STACK_SIZE
 #define sysSTK_SERL configMINIMAL_STACK_SIZE 
 #define sysSTK_MEKG configMINIMAL_STACK_SIZE
-#define sysSTK_CEKG configMINIMAL_STACK_SIZE
+#define sysSTK_CEKG configMINIMAL_STACK_SIZE + 500
 
 #define sysSTK_TOTAL (sysSTK_MEAS + sysSTK_COMP + sysSTK_DISP + \
                       sysSTK_ENUN + sysSTK_STAT + sysSTK_KEYS + \
@@ -81,7 +81,8 @@ typedef enum MeasureSelection_t {
   MEASURE_PRESSURE    = (1<<0),  ///< Blood pressure measurement selection
   MEASURE_TEMPERATURE = (1<<1),  ///< Temperature measurement selection
   MEASURE_PULSE       = (1<<2),  ///< Pulse rate measurement selection
-  MEASURE_END         = (1<<3),
+  MEASURE_EKG         = (1<<3),  ///< EKG measurement selection
+  MEASURE_END         = (1<<4),
 } MeasureSelection;
 
 // @formatter:on
@@ -215,6 +216,7 @@ typedef struct MeasureData {
   bool *completedSystolic;                ///< T when systolic read done
   bool *completedDiastolic;               ///< T when diastolic read done
   MeasureSelection *measurementSelection; ///< User's selected measurement
+  uint *currentPressure;
 } MeasureData;
 
 /**
@@ -294,6 +296,8 @@ typedef struct DisplayViewModel {
   float *batteryPercentage;           ///< Current battery percentage
   DisplayMode *mode;                  ///< Current display mode
   int *scrollPosn;                    ///< User's current scroll posn
+  bool *cuffControl;                  ///< toggle pressure control of cuff
+  uint *currentPressure;              ///< percent applied pressure
 } DisplayViewModel;
 
 /**
@@ -305,6 +309,8 @@ typedef struct ControllerData {
   int *scrollPosn;                ///< Current scroll position
   MeasureSelection *measurementSelection; ///< User's selected measurement
   bool *auralAlarmSilenced;       ///< True when user acknowledges the alarm
+  bool *cuffControl;                  ///< toggle pressure control of cuff
+  uint *currentPressure;              ///< percent applied pressure
 } ControllerData;
 
 /**
