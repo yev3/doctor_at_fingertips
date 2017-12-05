@@ -52,11 +52,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <IncludePath>$(ProjectDir)include;$(ProjectDir)..\common\include;$(ProjectDir)..\common\FreeRTOS\Source\portable\MSVC-MingW;$(ProjectDir)..\common\FreeRTOS\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\protocols\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\WinPCap;$(ProjectDir)..\common\curseslib\include;$(ProjectDir)..\common\SecondConsoleLogger\ConsoleLoggerLib;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include;$(ProjectDir)..\common\include;$(ProjectDir)..\common\FreeRTOS\Source\portable\MSVC-MingW;$(ProjectDir)..\common\FreeRTOS\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\WinPCap;$(ProjectDir)..\common\curseslib\include;$(ProjectDir)..\common\SecondConsoleLogger\ConsoleLoggerLib;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <IncludePath>$(ProjectDir)include;$(ProjectDir)..\common\include;$(ProjectDir)..\common\FreeRTOS\Source\portable\MSVC-MingW;$(ProjectDir)..\common\FreeRTOS\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\protocols\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\WinPCap;$(ProjectDir)..\common\curseslib\include;$(ProjectDir)..\common\SecondConsoleLogger\ConsoleLoggerLib;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include;$(ProjectDir)..\common\include;$(ProjectDir)..\common\FreeRTOS\Source\portable\MSVC-MingW;$(ProjectDir)..\common\FreeRTOS\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\WinPCap;$(ProjectDir)..\common\curseslib\include;$(ProjectDir)..\common\SecondConsoleLogger\ConsoleLoggerLib;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -311,10 +311,6 @@
     <ClCompile Include="..\common\include\utils\ustdlib.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="hardware_port.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="src\hardware_port.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -329,10 +325,7 @@
     <ClCompile Include="src\tasks\computeEKG.c" />
     <ClCompile Include="src\tasks\controller.c" />
     <ClCompile Include="src\tasks\display.c" />
-    <ClCompile Include="src\tasks\enunciate.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="src\tasks\alarms_warnings.c" />
     <ClCompile Include="src\tasks\init.c" />
     <ClCompile Include="src\tasks\ipconn.c" />
     <ClCompile Include="src\tasks\key_scan.c">
@@ -341,11 +334,9 @@
     </ClCompile>
     <ClCompile Include="src\tasks\measure.c" />
     <ClCompile Include="src\tasks\measureEKG.c" />
-    <ClCompile Include="src\tasks\serial_comms.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="src\tasks\serial_comms.c" />
     <ClCompile Include="src\tasks\status.c" />
+    <ClCompile Include="src\utils\cmd_parser.c" />
     <ClCompile Include="src\utils\float_print.c" />
     <ClCompile Include="src\utils\hardware_timer.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -372,6 +363,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\utils\tables.c" />
+    <ClCompile Include="src\utils\ustdlib.c" />
+    <ClCompile Include="src\webserver\FreeRTOS_HTTP_server.c" />
+    <ClCompile Include="src\webserver\FreeRTOS_TCP_server.c" />
     <ClCompile Include="src\windows_port.c" />
   </ItemGroup>
   <ItemGroup>
@@ -665,9 +659,13 @@
     <ClInclude Include="include\ranges.h" />
     <ClInclude Include="include\RTOSDebugTrace.h" />
     <ClInclude Include="include\RTOSIPTrace.h" />
+    <ClInclude Include="include\server\FreeRTOS_server_private.h" />
+    <ClInclude Include="include\server\FreeRTOS_TCP_server.h" />
+    <ClInclude Include="include\server\webpage_data.c" />
     <ClInclude Include="include\tasks\commands.h" />
     <ClInclude Include="include\tasks\system.h" />
     <ClInclude Include="include\types.h" />
+    <ClInclude Include="include\utils\cmd_dispatch.h" />
     <ClInclude Include="include\utils\float_print.h" />
     <ClInclude Include="include\utils\hardware_timer.h" />
     <ClInclude Include="include\utils\lcd_print.h" />

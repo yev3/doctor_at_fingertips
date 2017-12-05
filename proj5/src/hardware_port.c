@@ -17,6 +17,7 @@
  * \brief Initializes the hardware peripherals needed to read the keypad
  */
 #include <drivers/pulse_transducer.h>
+#include <utils/uartstdio.h>
 
 void keypad_init() {
   // Enable the peripherals used by the application.
@@ -158,3 +159,17 @@ void measure_ekg_init() {
   TimerEnable(TIMER2_BASE, TIMER_A);
 }
 
+/**
+ * \brief Initializes the board UART hardware
+ */
+void serial_init() {
+  // Enable board's serial port
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+
+  // Set GPIO A0 and A1 as UART pins.
+  GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+  // Configure the UART for 115,200, 8-N-1 operation.
+  UARTStdioConfig(0, 115200, SysCtlClockGet());
+}

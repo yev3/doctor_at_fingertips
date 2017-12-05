@@ -13,24 +13,21 @@
 
 /* FreeRTOS includes. */
 #include <FreeRTOS.h>
-#include <tasks/commands.h>
-#include <tasks/system.h>
 #include "task.h"
 
 /* Demo application includes. */
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_Sockets.h"
 
+#include "tasks/commands.h"
+#include "tasks/system.h"
+#include "server/FreeRTOS_TCP_server.h"
 
 /**
  * \brief Initializes the board hardware peripherals
  */
 void initializeHardwarePeriph();
 
-/**
- * \brief Initializes the remote network admin
- */
-void initializeNetwork();
 
 
 int main(void) {
@@ -40,7 +37,8 @@ int main(void) {
   // Initialize system tasks
   initVarsTasksQueues();
 
-  initializeNetwork();
+  // Initialize network hardware and tasks
+  network_init();
 
   //// TODO: remove when changes merged
   taskSuspend(sysTCB_MEAS_EKG);
@@ -103,9 +101,3 @@ void initializeHardwarePeriph() {
     enunciate_init();
   }
 }
-
-void initializeNetwork() {
-  network_init();
-  cmdStartDispatchTask(configMINIMAL_STACK_SIZE, tskIDLE_PRIORITY + 1);
-}
-

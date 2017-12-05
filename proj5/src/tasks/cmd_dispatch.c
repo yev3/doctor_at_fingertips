@@ -13,15 +13,6 @@
  *****************************************************************************/
 
 
-
-#if _CLION_ == 1
-//typedef unsigned char uint8_t;
-//typedef long int32_t;
-//#include <stdint.h>
-//#include <unitypes.h>
-//#include <stdbool.h>
-#endif
-
 #include <stdint.h>
 #include "FreeRTOS.h"
 #include "task.h"
@@ -31,24 +22,7 @@
 #include "tasks/system.h"
 #include "tasks/commands.h"
 
-static TaskHandle_t dispatchTaskHandle = NULL;
 static QueueHandle_t cmdQueue = NULL;
-
-static void cmdDispatchTask(void *pvParameters);
-
-void cmdStartDispatchTask(uint16_t usStackSize, UBaseType_t uxPriority) {
-  const BaseType_t uxQueueSize = 10;
-
-  /* Create the queue on which errors will be reported. */
-  cmdQueue = xQueueCreate(uxQueueSize, sizeof(SysCommand_t));
-  configASSERT(cmdQueue);
-
-  BaseType_t createResult =
-      xTaskCreate(cmdDispatchTask, "CmdDispatch", usStackSize, NULL,
-                  uxPriority + 1, &dispatchTaskHandle);
-  configASSERT(createResult);
-
-}
 
 bool cmdEnqueue(SysCommandsEnum_t cmd_, void *arg_) {
   SysCommand_t sysCmd = (SysCommand_t) {
@@ -59,7 +33,8 @@ bool cmdEnqueue(SysCommandsEnum_t cmd_, void *arg_) {
   return (pdPASS == xQueueSend(cmdQueue, &sysCmd, (TickType_t) 0));
 }
 
-static void cmdDispatchTask(void *pvParameters) {
+void cmdDispatch(void *pvParameters) {
+  cmdQueue = *(QueueHandle_t*)pvParameters;
   SysCommand_t receivedCmd;
   BaseType_t xStatus;
 
@@ -78,7 +53,7 @@ static void cmdDispatchTask(void *pvParameters) {
         case SCMD_STOP:FreeRTOS_debug_printf(("Stop\n"));
           break;
         case SCMD_DISPLAY_EN: {
-          SCDisplayArgsEnum_t arg = (SCDisplayArgsEnum_t) receivedCmd.arg;
+          SCDisplayArgsEnum_t arg = (SCDisplayArgsEnum_t)(BaseType_t) receivedCmd.arg;
           FreeRTOS_debug_printf(("Display=%d\n", arg));
         }
           break;

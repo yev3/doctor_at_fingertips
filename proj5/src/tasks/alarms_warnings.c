@@ -36,8 +36,6 @@
  * @param pSys corrected pressure in mmHg
  * @return true if the pressure is within the normal range
  */
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
 bool pSysNormal(const float *pSys) {
   return (SYS_PRESS_NORMAL_MIN <= *pSys) && (*pSys <= SYS_PRESS_NORMAL_MAX);
 }
@@ -347,29 +345,16 @@ void updateCurrentAlarmState(EnunciateData *enunciateData) {
   }
 }
 
-/**
- * \brief Updates the hardware state from the triggered alarms
- * \param data EnunciateData representing the triggered alarms
- */
-void updateHardwareStateFrom(EnunciateData *data) {
-  WarningAlarmStates *alarms = data->warningAlarmStates;
-  // Determine if any of the alarms were triggered
-  if (alarms->pulseOutOfRange || alarms->tempOutOfRange || alarms->bpOutOfRange ||
-      alarms->bpHighAlarm || alarms->battLowAlarm) {
-    // Update the current system alarm state
-    updateCurrentAlarmState(data);
-    // Information is output to the serial communications port when any
-    // alarms are active
-    taskScheduleForExec(sysTCB_SERIAL);
-  } else {
-    // When no alarm is present, unset the active flag and reset state
-    aState.alarmIsActive = false;
-    aState.led0 = LED0_SOLID;
-    aState.led1 = LED1_OFF;
-    aState.led2 = LED2_OFF;
-    aState.spkr = SPKR_OFF;
-  }
+static void clearAlarms() {
+  // When no alarm is present, unset the active flag and reset state
+  aState.alarmIsActive = false;
+  aState.led0 = LED0_SOLID;
+  aState.led1 = LED1_OFF;
+  aState.led2 = LED2_OFF;
+  aState.spkr = SPKR_OFF;
 }
+
+
 
 /**
  * \brief Initialize the system alarms to the default state
@@ -382,41 +367,67 @@ void enunciate_init() {
 }
 
 /**
+ * \brief Updates the alarm value and returns if it's a new alarm
+ * \param curAlarmState Pointer to the current alarm value
+ * \param newAlarmState New alarm value
+ * \return If the new alarm was triggered
+ */
+bool updateAlarmState(bool *curAlarmState, const bool newAlarmState) {
+  const bool isNew = (!*curAlarmState && newAlarmState);
+  *curAlarmState = newAlarmState;
+  return isNew;
+}
+
+/**
  * \brief Sets the warning and alarm flags based on the corrected sensor
  * values.
  * \param rawData raw data passed by the task scheduler
  */
-void enunciate(void *rawData) {
+void alarmWarn(void *rawData) {
+  // TCB data and buffer
+  EnunciateData *data = (EnunciateData *)rawData;
+  WarningAlarmStates *alarms = data->warningAlarmStates;
+  CorrectedBuffers *buf = (CorrectedBuffers *)data->correctedBuffers;
+
   for(;;) {
-    // TCB data and buffer
-    EnunciateData *data = (EnunciateData *) rawData;
-    WarningAlarmStates *alarms = data->warningAlarmStates;
-    CorrectedBuffers *buf = (CorrectedBuffers *) data->correctedBuffers;
+    bool newAlarmTriggered = false; // When set, a new alarm is triggered
+    bool alrm = false;              // Current alarm considered
 
     // Check if blood pressure is within acceptable range
-    alarms->bpOutOfRange =
-            !(pSysNormal(buf->pressures + buf->pressureIndex) &&
-              pDiaNormal(buf->pressures + buf->pressureIndex + BUF_SIZE));
+    alrm = !(pSysNormal(buf->pressures + buf->pressureIndex) &&
+             pDiaNormal(buf->pressures + buf->pressureIndex + BUF_SIZE));
+    newAlarmTriggered |= updateAlarmState(&alarms->bpOutOfRange, alrm);
 
     // Check if systolic pressure is >20% above acceptable range
-    alarms->bpHighAlarm = pSysHighAlarm(buf->pressures + buf->pressureIndex);
+    alrm = pSysHighAlarm(buf->pressures + buf->pressureIndex);
+    newAlarmTriggered |= updateAlarmState(&alarms->bpHighAlarm, alrm);
 
     // Check if temperature is within acceptable range
-    alarms->tempOutOfRange =
-            !tempNormal(buf->temperatures + buf->temperatureIndex);
+    alrm = !tempNormal(buf->temperatures + buf->temperatureIndex);
+    newAlarmTriggered |= updateAlarmState(&alarms->tempOutOfRange, alrm);
 
     // Check if pulse rate is within acceptable range
-    alarms->pulseOutOfRange = !pulseNormal(buf->pulseRates + buf->pulseRateIndex);
+    alrm = !pulseNormal(buf->pulseRates + buf->pulseRateIndex);
+    newAlarmTriggered |= updateAlarmState(&alarms->pulseOutOfRange, alrm);
 
     // Check if battery level is acceptable
-    alarms->battLowAlarm = !batteryIsNormal(data->batteryPercentage);
+    alrm = !batteryIsNormal(data->batteryPercentage);
+    newAlarmTriggered |= updateAlarmState(&alarms->battLowAlarm, alrm);
 
     // Update the hardware state from the triggered alarms
-    updateHardwareStateFrom(data);
+
+    // Determine if any of the alarms were triggered
+    if (newAlarmTriggered) {
+      // Update the current system alarm state
+      updateCurrentAlarmState(data);
+      // Information is output to the serial communications port when 
+      // a new alarm becomes acive
+      taskScheduleForExec(sysTCB_SERIAL);
+    } else {
+      static void clearAlarms();
+    }
 
     // Prevent this task from running unless scheduled by other tasks
     vTaskSuspend(NULL);
-//    vTaskDelay(pdMS_TO_TICKS(5));
   }
 }
-#pragma clang diagnostic pop

@@ -59,19 +59,30 @@ static MeasureSelection measureSelection = MEASURE_PRESSURE; ///< cur measure
 static EKGBuffer ekgBuffer;               ///< buffer holding EKG measurements
 static bool completedEKGMeasure = false;  ///< flag when measurement is done
 
+/*
+ * Command dispatcher state
+ */
+static QueueHandle_t cmdDispQueue = NULL; ///< Command dispatch queue
+
 /*****************************************************************************
  * Initialize static queues
  *****************************************************************************/
 
-static StaticQueue_t queueKeysStatic;
-static uint8_t queueKeysStaticStorage[sysKEY_QUEUE_LEN * sizeof(KeyPress_t)];
+static StaticQueue_t queueStaticBlockBuf[sysQUEUE_STATIC_COUNT];
+static uint8_t queueStatBufKeys[sysQUEUE_LEN_KEYS * sizeof(KeyPress_t)];
+static uint8_t queueStatBufCmds[sysQUEUE_LEN_CMD_PARSE * sizeof(SysCommand_t)];
 
 void initStaticQueues() {
-
-  keyPressQueue = xQueueCreateStatic(sysKEY_QUEUE_LEN,
+  keyPressQueue = xQueueCreateStatic(sysQUEUE_LEN_KEYS,
                                      sizeof(KeyPress_t),
-                                     queueKeysStaticStorage,
-                                     &queueKeysStatic);
+                                     queueStatBufKeys,
+                                     &queueStaticBlockBuf[0]);
+
+  cmdDispQueue = xQueueCreateStatic(sysQUEUE_LEN_CMD_PARSE,
+                                     sizeof(SysCommand_t),
+                                     queueStatBufCmds,
+                                     &queueStaticBlockBuf[1]);
+  configASSERT(keyPressQueue);
   configASSERT(keyPressQueue);
 }
 
@@ -84,28 +95,32 @@ static MeasureData measureData        = {0};  ///< measure task data
 static ComputeData computeData        = {0};  ///< compute task data
 static DispViewModel_t dispviewModel  = {0};  ///< UI model state
 static DisplayData displayData        = {0};  ///< display task data
-static EnunciateData enunciateData    = {0};  ///< compute task data
+static EnunciateData alarmWarnData    = {0};  ///< compute task data
 static StatusData statusData          = {0};  ///< status task data
-static ControllerData controllerData  = {0};  ///< ui controller task data
+static ControllerData uiCtrlData      = {0};  ///< ui controller task data
 static SerialCommData serialData      = {0};  ///< ui controller task data
 static MeasureEKGData measEKGData     = {0};  ///< EKG measure task data
 static ComputeEKGData compEKGData     = {0};  ///< EKG compute task data
+//static const TaskHandle_t *serverData = &taskHandles[sysTCB_SERVER];
+#define serverData (&taskHandles[sysTCB_SERVER])
 
 /*****************************************************************************
  * Forward declarations of the external routines and initialization functions
  * referenced in the initializations. 
  *****************************************************************************/
 
-extern void measure(void *rawData);
-extern void compute(void *rawData);
-extern void display(void *rawData);
-extern void enunciate(void *rawData);
-extern void key_scan(void *rawData);
-extern void ui_controller(void *rawData);
-extern void status(void *rawData);
-extern void serial_comms(void *rawData);
-extern void measureEKG(void *rawData);
-extern void computeEKG(void *rawData);
+extern void measure(void *arg);
+extern void compute(void *arg);
+extern void display(void *arg);
+extern void alarmWarn(void *arg);
+extern void key_scan(void *arg);
+extern void uiControl(void *arg);
+extern void status(void *arg);
+extern void serial_comms(void *arg);
+extern void measureEKG(void *arg);
+extern void computeEKG(void *arg);
+extern void cmdDispatch(void *arg);
+extern void ipServerWork(void *arg);
 
 /*****************************************************************************
  * Static task allocation data and routines
@@ -126,21 +141,23 @@ typedef struct {
 } TCBStaticEntry_t;
 
 #define TE(ENUM_ID,FN,DATA,PRI,STK) \
-   {(ENUM_ID), (FN), (#FN), ((uint16_t)(STK)), &(DATA), ((uint8_t)(PRI))}
+   {(ENUM_ID), (FN), (#FN), ((uint16_t)(STK)), (DATA), ((uint8_t)(PRI))}
 
 ////////////////////////////////////////////////////////////////////////////////
 static const TCBStaticEntry_t taskEntries[] = {
-// TaskNameEnum_t     function       argument        priority     stack size
-TE(sysTCB_MEASURE   , measure,       measureData,    sysPRI_MEAS, sysSTK_MEAS), 
-TE(sysTCB_COMPUTE   , compute,       computeData,    sysPRI_COMP, sysSTK_COMP),
-TE(sysTCB_DISPLAY   , display,       displayData,    sysPRI_DISP, sysSTK_DISP),
-TE(sysTCB_ENUNCIATE , enunciate,     enunciateData,  sysPRI_ENUN, sysSTK_ENUN),
-TE(sysTCB_STATUS    , status,        statusData,     sysPRI_STAT, sysSTK_STAT),
-TE(sysTCB_KEYSCAN   , key_scan,      keyPressQueue,  sysPRI_KEYS, sysSTK_KEYS),
-TE(sysTCB_CONTROLLER, ui_controller, controllerData, sysPRI_CONT, sysSTK_CONT),
-TE(sysTCB_SERIAL    , serial_comms,  serialData,     sysPRI_SERL, sysSTK_SERL),
-TE(sysTCB_MEAS_EKG  , measureEKG,    measEKGData,    sysPRI_MEKG, sysSTK_MEKG),
-TE(sysTCB_COMP_EKG  , computeEKG,    compEKGData,    sysPRI_CEKG, sysSTK_CEKG),
+// TaskNameEnum_t    function      argument        priority     stack size
+TE(sysTCB_MEASURE   ,measure,      &measureData,   sysPRI_MEAS,  sysSTK_MEAS), 
+TE(sysTCB_COMPUTE   ,compute,      &computeData,   sysPRI_COMP,  sysSTK_COMP),
+TE(sysTCB_DISPLAY   ,display,      &displayData,   sysPRI_DISP,  sysSTK_DISP),
+TE(sysTCB_ENUNCIATE ,alarmWarn,    &alarmWarnData, sysPRI_ENUN,  sysSTK_ENUN),
+TE(sysTCB_STATUS    ,status,       &statusData,    sysPRI_STAT,  sysSTK_STAT),
+TE(sysTCB_KEYSCAN   ,key_scan,     &keyPressQueue, sysPRI_KEYS,  sysSTK_KEYS),
+TE(sysTCB_CONTROLLER,uiControl,    &uiCtrlData,    sysPRI_CONT,  sysSTK_CONT),
+TE(sysTCB_SERIAL    ,serial_comms, &serialData,    sysPRI_SERL,  sysSTK_SERL),
+TE(sysTCB_MEAS_EKG  ,measureEKG,   &measEKGData,   sysPRI_MEKG,  sysSTK_MEKG),
+TE(sysTCB_COMP_EKG  ,computeEKG,   &compEKGData,   sysPRI_CEKG,  sysSTK_CEKG),
+TE(sysTCB_CMD_PARSE ,cmdDispatch,  &cmdDispQueue,  sysPRI_PARSR, sysSTK_PARSR),
+TE(sysTCB_SERVER    ,ipServerWork, serverData,     sysPRI_SERVR, sysSTK_SERVR),
 };
 
 #undef TE
@@ -267,7 +284,7 @@ void globalVarsAndBuffersInit() {
   };
 
   // Initialize the warning data pointers
-  enunciateData = (EnunciateData) {
+  alarmWarnData = (EnunciateData) {
     .correctedBuffers = &correctedBuffers,
     .measurementSelection = &measureSelection,
     .batteryPercentage = &batteryPercentage,
@@ -279,7 +296,7 @@ void globalVarsAndBuffersInit() {
   statusData.batteryState = &rawBatteryState;
 
   // Initialize the ui controller data pointers
-  controllerData = (ControllerData) {
+  uiCtrlData = (ControllerData) {
     .keyPressQueueHandle = keyPressQueue,
     .viewModel = &dispviewModel,
     .measureSelect = &measureSelection,

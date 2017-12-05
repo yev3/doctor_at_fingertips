@@ -145,8 +145,8 @@ things such as a DHCP transaction number or initial sequence number.  Random
 number generation is performed via this macro to allow applications to use their
 own random number generation method.  For example, it might be possible to
 generate a random number by sampling noise on an analogue input. */
-extern UBaseType_t uxRand();
-#define ipconfigRAND32()	uxRand()
+extern int urand();
+#define ipconfigRAND32()	((UBaseType_t)urand())
 
 /* If ipconfigUSE_NETWORK_EVENT_HOOK is set to 1 then FreeRTOS+TCP will call the
 network event hook at the appropriate times.  If ipconfigUSE_NETWORK_EVENT_HOOK
@@ -343,7 +343,7 @@ disconnecting stage will timeout after a period of non-activity. */
 /* Set to 1 or 0 to include/exclude FTP and HTTP functionality from the standard
 server task. */
 #define ipconfigUSE_FTP						0
-#define ipconfigUSE_HTTP					0
+#define ipconfigUSE_HTTP					1
 
 /* Buffer and window sizes used by the FTP and HTTP servers respectively.  The
 FTP and HTTP servers both execute in the standard server task. */

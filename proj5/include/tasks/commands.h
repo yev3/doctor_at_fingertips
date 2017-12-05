@@ -38,12 +38,11 @@ typedef struct {
 }SysCommand_t;
 
 
-typedef enum {
+typedef enum SCDisplayArgsEnum_t{
   SC_ARG_DISP_ON = 1,
   SC_ARG_DISP_OFF = 0,
 } SCDisplayArgsEnum_t;
 
-void cmdStartDispatchTask(uint16_t usStackSize, UBaseType_t uxPriority);
 bool cmdEnqueue(SysCommandsEnum_t cmd_, void *arg_);
 
 

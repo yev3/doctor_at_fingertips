@@ -24,7 +24,7 @@
  * actions according to the current system state.
  * \param rawData raw data passed by the task scheduler
  */
-void ui_controller(void *rawData) {
+void uiControl(void *rawData) {
   ControllerData *data = (ControllerData *) rawData;
   QueueHandle_t keyPresses = data->keyPressQueueHandle;
   DispViewModel_t *ui = data->viewModel;

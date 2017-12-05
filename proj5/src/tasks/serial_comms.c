@@ -21,22 +21,6 @@
 #include "utils/float_print.h"
 #include "tasks/system.h"
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
-/**
- * \brief Initializes the board UART hardware
- */
-void serial_init() {
-  // Enable board's serial port
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-
-  // Set GPIO A0 and A1 as UART pins.
-  GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-  // Configure the UART for 115,200, 8-N-1 operation.
-  UARTStdioConfig(0, 115200, SysCtlClockGet());
-}
 
 /**
  * \brief Outputs the state of the warning/alarm to the serial
@@ -107,5 +91,3 @@ void serial_comms(void *rawData) {
 //    vTaskDelay(pdMS_TO_TICKS(1));
   }
 }
-
-#pragma clang diagnostic pop

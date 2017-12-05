@@ -14,6 +14,7 @@
 #include "drivers/pulse_transducer.h"
 #include "driverlib/adc.h"
 #include "tasks/system.h"
+#include "hardware_port.h"
 
 /*******************************************************************************
  * Initialization of Temperature Sensor
@@ -35,9 +36,7 @@ bool processTempMeasure(RawBuffers *buf) {
   uint *newT = buf->temperatures + newIdx;
   buf->temperatureIndex = newIdx;
 
-  unsigned long adcVal;
-  getRawTempVal(&adcVal);
-  *newT = adcVal;
+  *newT = getRawTempVal();
   
   // Always finishes measurement in one call
   return true;

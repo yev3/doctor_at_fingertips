@@ -7,6 +7,8 @@
 #include "task.h"
 #include "queue.h"
 #include "tasks/commands.h"
+#include <utils/ustdlib.h>
+#include <stdarg.h>
 
 /*
  * HARDWARE TIMER
@@ -41,11 +43,6 @@ void Timer1InitDefault() {}
 system_tick_t GetElapsedTicks() { return 0; }
 
 
-
-
-
-
-
 void SysCtlClockSet(unsigned long ulConfig) {}
 
 // Initialize the UART to display serial text to the user's PC terminal
@@ -71,9 +68,6 @@ void pulse_init(){}
 // Initialize hardware port required for playing sound
 void speaker_init(){}
 
-// Initialize the hardware required for flashing the LED and speaker
-void enunciate_init(){}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Output functions
@@ -81,6 +75,18 @@ void enunciate_init(){}
 
 int UARTwrite(const char *pcBuf, unsigned long ulLen) {
   return LoggerWrite(pcBuf, ulLen);
+}
+
+
+void UARTprintf(const char *fmt, ...) {
+  static char buf[2048];
+  static const size_t bufSize = sizeof(buf);
+  va_list args;
+  va_start(args, fmt);
+  int numWritten = uvsnprintf(buf, bufSize-1, fmt, args);
+  buf[numWritten] = '\0';
+  numWritten = UARTwrite(buf, numWritten);
+  va_end(args);
 }
 
 void lcd_init() {
@@ -127,20 +133,22 @@ void lcd_print_float(double value, int padding, int precision) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Speaker and LEDs
+////////////////////////////////////////////////////////////////////////////////
+void led0_on(){}
+void led1_on(){}
+void led2_on(){}
+
+void led0_off(){}
+void led1_off(){}
+void led2_off(){}
+
+void sound_on(){}
+void sound_off(){}
+
+////////////////////////////////////////////////////////////////////////////////
 // TASKS
 ////////////////////////////////////////////////////////////////////////////////
-
-void enunciate(void* arg) {
-  for(;;) {
-    portYIELD();
-  }
-}
-
-void serial_comms(void* arg) {
-  for(;;) {
-    portYIELD();
-  }
-}
 
 void sendKeyPress(QueueHandle_t keyQueue, KeyPress_t key) {
   xQueueSend(keyQueue, &key, 0);  
@@ -172,8 +180,6 @@ void key_scan(void *arg) {
     }
     vTaskDelay(pdMS_TO_TICKS(5));
   }
-
-  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -193,7 +199,7 @@ void NetworkGetMAC(uint8_t *ucMACAddress) {
 // ADC
 ////////////////////////////////////////////////////////////////////////////////
 uint getRawTempVal() {
-  return 100;
+  return 25 + urand() % 50;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

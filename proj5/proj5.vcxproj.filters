@@ -18,9 +18,6 @@
     <ClCompile Include="src\tasks\display.c">
       <Filter>tasks</Filter>
     </ClCompile>
-    <ClCompile Include="src\tasks\enunciate.c">
-      <Filter>tasks</Filter>
-    </ClCompile>
     <ClCompile Include="src\utils\lcd_print.c">
       <Filter>utils</Filter>
     </ClCompile>
@@ -279,11 +276,23 @@
     <ClCompile Include="src\utils\hardware_timer.c">
       <Filter>utils</Filter>
     </ClCompile>
-    <ClCompile Include="hardware_port.c">
-      <Filter>utils</Filter>
-    </ClCompile>
     <ClCompile Include="src\windows_port.c" />
     <ClCompile Include="src\hardware_port.c" />
+    <ClCompile Include="src\utils\ustdlib.c">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tasks\alarms_warnings.c">
+      <Filter>tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="src\webserver\FreeRTOS_HTTP_server.c">
+      <Filter>webserver</Filter>
+    </ClCompile>
+    <ClCompile Include="src\webserver\FreeRTOS_TCP_server.c">
+      <Filter>webserver</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\cmd_parser.c">
+      <Filter>utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FreeRTOSConfig.h" />
@@ -861,6 +870,18 @@
     <ClInclude Include="include\hardware_port.h">
       <Filter>includes</Filter>
     </ClInclude>
+    <ClInclude Include="include\utils\cmd_dispatch.h">
+      <Filter>includes\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\server\FreeRTOS_server_private.h">
+      <Filter>includes\webserver</Filter>
+    </ClInclude>
+    <ClInclude Include="include\server\FreeRTOS_TCP_server.h">
+      <Filter>includes\webserver</Filter>
+    </ClInclude>
+    <ClInclude Include="include\server\webpage_data.c">
+      <Filter>webserver</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="tasks">
@@ -908,6 +929,12 @@
     </Filter>
     <Filter Include="deps\FreeRTOS-TCP\portable">
       <UniqueIdentifier>{44193392-cfc6-4f5b-a143-25462880b7b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="webserver">
+      <UniqueIdentifier>{d00783e6-0533-4518-ab4e-b2cd1418a94f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="includes\webserver">
+      <UniqueIdentifier>{fcd3ae6a-0994-47e0-bacd-0f6af9744097}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

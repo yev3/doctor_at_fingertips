@@ -32,12 +32,15 @@ typedef enum {
   sysTCB_STATUS      = 4,   ///< STATUS 
   sysTCB_KEYSCAN     = 5,   ///< KEY SCAN 
   sysTCB_CONTROLLER  = 6,   ///< CONTROLLER 
-  sysTCB_SERIAL      = 7,   ///< SERIAL COMMS 
-  sysTCB_MEAS_EKG    = 8,  ///< EKG MEASURE 
-  sysTCB_COMP_EKG    = 9,  ///< EKG COMPUTE 
+  sysTCB_CMD_PARSE   = 7,   ///< CONTROLLER 
+  sysTCB_SERIAL      = 8,   ///< SERIAL COMMS 
+  sysTCB_MEAS_EKG    = 9,   ///< EKG MEASURE 
+  sysTCB_COMP_EKG    = 10,  ///< EKG COMPUTE 
+  sysTCB_SERVER      = 11,  ///< EKG COMPUTE 
+  sysTCB_LAST_TASK   = 11   ///< Last task
 } TaskNameEnum_t;
 
-#define sysTASK_COUNT (sysTCB_COMP_EKG + 1)
+#define sysTASK_COUNT (sysTCB_LAST_TASK + 1)
 
 /*
  * Priorities above idle for tasks
@@ -52,20 +55,24 @@ typedef enum {
 #define sysPRI_SERL  3
 #define sysPRI_MEKG  3
 #define sysPRI_CEKG  3
+#define sysPRI_PARSR 3
+#define sysPRI_SERVR 4
 
 /*
  * Stack sizes
  */
-#define sysSTK_MEAS configMINIMAL_STACK_SIZE
-#define sysSTK_COMP configMINIMAL_STACK_SIZE
-#define sysSTK_DISP configMINIMAL_STACK_SIZE
-#define sysSTK_ENUN configMINIMAL_STACK_SIZE
-#define sysSTK_STAT configMINIMAL_STACK_SIZE
-#define sysSTK_KEYS configMINIMAL_STACK_SIZE
-#define sysSTK_CONT configMINIMAL_STACK_SIZE
-#define sysSTK_SERL configMINIMAL_STACK_SIZE 
-#define sysSTK_MEKG configMINIMAL_STACK_SIZE
-#define sysSTK_CEKG configMINIMAL_STACK_SIZE
+#define sysSTK_MEAS      configMINIMAL_STACK_SIZE
+#define sysSTK_COMP      configMINIMAL_STACK_SIZE
+#define sysSTK_DISP      configMINIMAL_STACK_SIZE
+#define sysSTK_ENUN      configMINIMAL_STACK_SIZE
+#define sysSTK_STAT      configMINIMAL_STACK_SIZE
+#define sysSTK_KEYS      configMINIMAL_STACK_SIZE
+#define sysSTK_CONT      configMINIMAL_STACK_SIZE
+#define sysSTK_SERL      configMINIMAL_STACK_SIZE 
+#define sysSTK_MEKG      configMINIMAL_STACK_SIZE
+#define sysSTK_CEKG      configMINIMAL_STACK_SIZE
+#define sysSTK_PARSR     configMINIMAL_STACK_SIZE
+#define sysSTK_SERVR     ((unsigned short)(1400))
 
 /*
  * Total amount of stack used by the tasks
@@ -73,12 +80,14 @@ typedef enum {
 #define sysSTK_TOTAL (sysSTK_MEAS + sysSTK_COMP + sysSTK_DISP + \
                       sysSTK_ENUN + sysSTK_STAT + sysSTK_KEYS + \
                       sysSTK_CONT + sysSTK_SERL + sysSTK_MEKG + \
-                      sysSTK_CEKG)
+                      sysSTK_CEKG + sysSTK_PARSR + sysSTK_SERVR)
 
 /*
  * Length of the key command queue
  */
-#define sysKEY_QUEUE_LEN 5
+#define sysQUEUE_LEN_KEYS       5
+#define sysQUEUE_LEN_CMD_PARSE 10
+#define sysQUEUE_STATIC_COUNT   2
 
 
 /**
