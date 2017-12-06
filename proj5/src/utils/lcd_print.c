@@ -14,6 +14,7 @@
 #include <string.h>
 #include "utils/ustdlib.h"
 #include "utils/lcd_print.h"
+#include "tasks/system.h"
 
 #define UC_LEVEL 15                     /* Contrast level of the LCD chars */
 static int cursorX = 0;                 ///< Current LCD X position

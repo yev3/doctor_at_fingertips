@@ -39,11 +39,6 @@ extern QueueHandle_t measurementCommands;
 #define PRESSURE_MAX 100    /* Raw sensor units */
 
 /**
- * \brief Initializes the pulse measurement driver
- */
-//void pressure_cuff_init();
-
-/**
  * \brief Increases the pressure of the cuff by default percent step
  */
 void IncreasePressure();

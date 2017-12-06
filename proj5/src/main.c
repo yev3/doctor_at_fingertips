@@ -1,8 +1,14 @@
+////////////////////////////////////////////////////////////////////////////////
+// Project 5, CPSC 5530 Embedded Systems, Seattle University
+// Team "ARM Brewery"
+// Edward Guevara, David Pierce, and Yevgeni Kamenski
 //
-// Main entry Point
+// main.c
+// Project main entry point.
 //
+// This is free and unencumbered software released into the public domain.
+////////////////////////////////////////////////////////////////////////////////
 
-/* Standard includes. */
 #include <stdio.h>
 #include <time.h>
 #include <stdarg.h>
@@ -11,18 +17,13 @@
 #include <inc/hw_types.h>
 #include <driverlib/sysctl.h>
 
-/* FreeRTOS includes. */
 #include <FreeRTOS.h>
 #include "task.h"
-
-/* Demo application includes. */
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_Sockets.h"
 
-#include "tasks/commands.h"
 #include "tasks/system.h"
-#include "server/FreeRTOS_TCP_server.h"
-#include <drivers/pressure_cuff.h>
+#include "utils/lcd_print.h"
 
 /**
  * \brief Initializes the board hardware peripherals
@@ -39,23 +40,13 @@ int main(void) {
   // Initialize network hardware and tasks
   network_init();
 
-  //// TODO: remove when changes merged
-  taskSuspend(sysTCB_MEAS_EKG);
-  taskSuspend(sysTCB_COMP_EKG);
-  
   // Start the RTOS scheduler.
   FreeRTOS_debug_printf(("vTaskStartScheduler\n"));
   vTaskStartScheduler();
 
   for (;;) {
-    // Should never reach
-#ifdef WIN32
-    Sleep(pdMS_TO_TICKS(1000UL));
-#endif
   }
 }
-/*-----------------------------------------------------------*/
-
 
 /**
  * \brief Initializes the board hardware peripherals
@@ -86,9 +77,6 @@ void initializeHardwarePeriph() {
 
     // Initialize the hardware timer to simulate the pulse transducer driver
     pulse_init();
-
-    // Initialize hardware timer to simulate pressure cuff
-    pressure_cuff_init();
 
     // Initialize the onboard OLED display
     lcd_init();

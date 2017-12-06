@@ -20,7 +20,7 @@
 #include <utils/hardware_timer.h>
 #include "FreeRTOS.h"
 #include "task.h"
-#include "types.h"
+#include "tasks/system.h"
 
 /**
  * \brief Current elapsed number of ticks, local to this module, accessed

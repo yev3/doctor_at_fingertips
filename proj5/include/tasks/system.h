@@ -15,10 +15,12 @@
 #include "task.h"
 #include "queue.h"
 
+// Typedefs to improve code readability
 typedef unsigned int uint;
 typedef unsigned char uchar;
 typedef unsigned short ushort;
 typedef unsigned long ulong;
+typedef unsigned long long ullong;
 
 // @formatter:off
 /******************************************************************************

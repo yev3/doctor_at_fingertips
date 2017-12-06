@@ -40,13 +40,6 @@ void uiControl(void *rawData) {
         taskScheduleForExec(sysTCB_ENUNCIATE);
       }
 
-      // Mode selection is toggled by the right key
-      //if (cmdKEY_RIGHT == key) {
-      //  ui->mode = (MENU_DISP_MODE == ui->mode)
-      //                    ? ENUNCIATE_DISP_MODE
-      //                    : MENU_DISP_MODE;
-      //}
-
       if (MENU_DISP_MODE == ui->mode) {
         // Menu mode
         if (cmdKEY_RIGHT == key) {

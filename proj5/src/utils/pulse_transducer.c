@@ -13,6 +13,7 @@
 
 #include <drivers/pulse_transducer.h>
 #include "utils/float_print.h"
+#include "tasks/system.h"
 
 #define PULSE_TIMER_PRESCALE (0x10)           /* Prescale for timer */
 static ulong clockPerSec = 0;                 ///< CPU clk used when converting

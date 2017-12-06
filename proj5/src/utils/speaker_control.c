@@ -11,6 +11,7 @@
  * you can buy us a beer in return. - Team "ARM Brewery"                     *
  *****************************************************************************/
 #include "utils/speaker_control.h"
+#include "tasks/system.h"
 
 /**
  * Initializes the PWM port (G)
