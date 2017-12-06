@@ -18,38 +18,16 @@
 #include "utils/ustdlib.h"
 #include "utils/uartstdio.h"
 
-/* FreeRTOS includes. */
-#include "FreeRTOS.h"
-#include "task.h"
-#include "semphr.h"
-
-/* FreeRTOS+TCP includes. */
-#include "FreeRTOS_IP.h"
-#include "FreeRTOS_Sockets.h"
-#include "tasks/commands.h"
-
+#include "server/server.h"
 #include "tasks/system.h"
+#include "tasks/commands.h"
 #include "hardware_port.h"
-#include "server/FreeRTOS_TCP_server.h"
-#include "FreeRTOS_IP_Private.h"
-#include "server/FreeRTOS_server_private.h"
 
-/**
- * \brief Main server task. Blocks on IP events, waiting for connections.
- * When connection is established, uses a socket set to monitor traffic
- * events and dispatches the attached workers. Both webserver and telnet
- * connections are thus handles by this single task
- * \param pvParameters Passed parameters by the init task.
- */
-void ipServerTask(void *pvParameters);
+// Compressed webpage data
+#include "server/webpage_data.c"
+#include "utils/float_print.h"
 
-/**
- * \brief Worker for the telnet connection. Receives commands, parses
- * them, and dispatches controls to the rest of the board. 
- * \param pxTCPClient Connected client
- * \return Socket read/write result
- */
-static BaseType_t telnetWork(TCPClient_t *pxTCPClient);
+#define SERVER_COUNT 2
 
 /**
  * \brief Server configuration. Web interface is on port 80, telnet
@@ -75,6 +53,18 @@ uint8_t ucMACAddress[8];
  * sockets.
  */
 static TaskHandle_t serverWorkTaskHandle = NULL;
+
+/**
+ * \brief Reference to corrected buffers when outputting device data.
+ * Initialized when task starts up.
+ */
+static CorrectedBuffers * correctedBuffers = NULL;
+
+/**
+ * \brief Reference to alarm state when outputting device data.
+ * Initialized when task starts up.
+ */
+static WarningAlarmStates * warnAlarms = NULL;
 
 /**
  * \brief Initializes the network stack
@@ -215,7 +205,10 @@ static BaseType_t telnetWork( TCPClient_t *pxTCPClient )
  */
 void ipServerTask(void *pvParameters)
 {
-  serverWorkTaskHandle = *(TaskHandle_t*)pvParameters;
+  serverWorkTaskHandle = xTaskGetCurrentTaskHandle();
+  IPTaskData_t * data = (IPTaskData_t*)pvParameters;
+  correctedBuffers = data->correctedBuffers;
+  warnAlarms = data->warnAlarms;
 
   TCPServer_t *pxTCPServer = NULL;
   const TickType_t xInitialBlockTime = portMAX_DELAY;
@@ -226,9 +219,240 @@ void ipServerTask(void *pvParameters)
   ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
   // Initialize the server
-  pxTCPServer = getStaticTCPServer(serverConfig, ARRAY_SIZE(serverConfig));
+  pxTCPServer = getStaticTCPServer(serverConfig, SERVER_COUNT);
 
   for (;;) {
     FreeRTOS_TCPServerWork(pxTCPServer, xInitialBlockTime);
   }
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// File manipulation decls
+////////////////////////////////////////////////////////////////////////////////
+size_t ff_fread(void *outBuf, const size_t itemSize, 
+                const size_t itemCount, FF_FILE *file) {
+  // Determine how much to read
+  const BaseType_t avail = file->ulFileSize - file->curReadPosn;
+  if (avail <= 0) {
+    return 0;
+  }
+
+  // Read up to the smaller of (buffer or available)
+  const BaseType_t reqReadSize = itemSize * itemCount;
+  const BaseType_t readSize = reqReadSize < avail ? reqReadSize : avail;
+
+  memcpy(outBuf, file->fileBuf + file->curReadPosn, readSize);
+  file->curReadPosn += readSize;
+
+  return readSize;
+}
+
+/**
+ * \brief Opens the main page file
+ * \return Pointer to a file
+ */
+FF_FILE *ff_fopen_main() {
+  static FF_FILE file;
+  file = (FF_FILE) {
+    .fileBuf = index_min_html_gz_dat,
+    .curReadPosn = 0,
+    .ulFileSize = index_min_html_gz_dat_len
+  };
+  return &file;
+}
+
+static char jsonBuf[750] = {0};
+static FF_FILE jsonFile;
+#define NUM_BUF_SIZE 7
+static char numBuf[NUM_BUF_SIZE];
+
+// Helper to put the string to the buffer
+void putStr(const char* src, int n) {
+  if (n > jsonFile.ulFileSize)
+    n = jsonFile.ulFileSize;
+  memcpy(jsonFile.fileBuf, src, n);
+  jsonFile.fileBuf += n;
+  jsonFile.curReadPosn += n;
+  jsonFile.ulFileSize -= n;
+}
+
+  //sprint_float(num, (sizeof(num)), 12.0, 0, 0);
+
+void putPressEntry(int idx) {
+  static const char syst[] = "{\"syst\":";
+  static const char dias[] = ",\"dias\":";
+
+  putStr(syst, (sizeof(syst) - 1));
+  int n = usnprintf(numBuf, NUM_BUF_SIZE, "%d", 
+                    (int)correctedBuffers->pressures[idx]);
+  putStr(numBuf, n);
+
+  putStr(dias, (sizeof(syst) - 1));
+  n = usnprintf(numBuf, NUM_BUF_SIZE, "%d", 
+                (int)correctedBuffers->pressures[idx + BUF_SIZE]);
+  putStr(numBuf, n);
+  putStr("}", 1);
+}
+
+void putPressures() {
+  static const char head[] = "\"bloodPressure\":[";
+  putStr(head, (sizeof(head) - 1));
+
+  for (int i = BUF_SIZE; i > 0; --i) {
+    const int idx = (correctedBuffers->pressureIndex + i) % BUF_SIZE;
+    putPressEntry(idx);
+    if (i != 1) {
+      putStr(",", 1);
+    }
+  }
+  putStr("]", 1);
+}
+
+void putTemp() {
+  static const char head[] = "\"temperature\":[";
+  putStr(head, (sizeof(head) - 1));
+
+  for (int i = BUF_SIZE; i > 0; --i) {
+    const int idx = (correctedBuffers->temperatureIndex + i) % BUF_SIZE;
+    const int n = sprint_float(numBuf, NUM_BUF_SIZE, 
+                               correctedBuffers->temperatures[idx], 0, 1);
+    putStr(numBuf, n);
+    if (i != 1) {
+      putStr(",", 1);
+    }
+  }
+
+  putStr("]", 1);
+}
+
+void putPulse() {
+  static const char head[] = "\"pulseRate\":[";
+  putStr(head, (sizeof(head) - 1));
+
+  for (int i = BUF_SIZE; i > 0; --i) {
+    const int idx = (correctedBuffers->pulseRateIndex + i) % BUF_SIZE;
+    const int n = usnprintf(numBuf, NUM_BUF_SIZE, "%d",
+                            (int)correctedBuffers->pulseRates[idx]);
+    putStr(numBuf, n);
+    if (i != 1) {
+      putStr(",", 1);
+    }
+  }
+
+  putStr("]", 1);
+}
+
+void putEKG() {
+  static const char head[] = "\"ECG\":[";
+  putStr(head, (sizeof(head) - 1));
+
+  for (int i = BUF_SIZE; i > 0; --i) {
+    const int idx = (correctedBuffers->ekgIndex + i) % BUF_SIZE;
+    const int n = usnprintf(numBuf, NUM_BUF_SIZE, "%d",
+                            (int)correctedBuffers->ekgFrequency[idx]);
+    putStr(numBuf, n);
+    if (i != 1) {
+      putStr(",", 1);
+    }
+  }
+
+  putStr("]", 1);
+}
+
+void putTF(bool val) {
+  if (val) {
+    putStr("true", 4);
+  } else {
+    putStr("false", 5);
+  }
+}
+
+void putWarnAlarm() {
+  static const char head[] = "\"warningAlarm\":{";
+  putStr(head, (sizeof(head) - 1));
+
+  putStr("\"bpOutOfRange\":", 15);
+  putTF(warnAlarms->bpOutOfRange);
+
+  putStr(",\"tempOutOfRange\":", 18);
+  putTF(warnAlarms->tempOutOfRange);
+
+  putStr(",\"pulseOutOfRange\":", 19);
+  putTF(warnAlarms->pulseOutOfRange);
+
+  putStr(",\"bpHighAlarm\":", 15);
+  putTF(warnAlarms->bpHighAlarm);
+
+  putStr(",\"tempHighAlarm\":", 17);
+  putTF(warnAlarms->tempHighAlarm);
+
+  putStr(",\"pulseLowAlarm\":", 17);
+  putTF(warnAlarms->pulseLowAlarm);
+
+  putStr(",\"battLowAlarm\":", 16);
+  putTF(warnAlarms->battLowAlarm);
+
+  putStr("}", 1);
+}
+
+
+void putBoardState() {
+  static const char head[] = "\"boardState\":{";
+  putStr(head, (sizeof(head) - 1));
+
+  putStr("}", 1);
+}
+
+void putMeasurements() {
+  static const char head[] = "\"measurements\":{";
+  putStr(head, (sizeof(head) - 1));
+
+  putPressures();
+  putStr(",", 1);
+  putTemp();
+  putStr(",", 1);
+  putPulse();
+  putStr(",", 1);
+  putEKG();
+
+  putStr("}", 1);
+}
+
+void putJson() {
+  putStr("{", 1);
+  putMeasurements();
+  putStr(",", 1);
+  putWarnAlarm();
+  putStr(",", 1);
+  putBoardState();
+  putStr("}", 1);
+}
+
+/**
+ * \brief Opens the board status file. It is generated from the buffers and alarm status
+ * \return Pointer to a file
+ */
+FF_FILE *ff_fopen_json() {
+  jsonFile = (FF_FILE) {
+    .curReadPosn = 0,
+    .fileBuf = jsonBuf,
+    .ulFileSize = (sizeof(jsonBuf))
+  };
+
+  static const char head[] =
+    "HTTP/1.0 200 OK\r\n"
+    "Content-Type: application/json; charset=utf-8\r\n"
+    "Connection: close\r\n"
+    "\r\n";
+
+  putStr(head, (sizeof(head)) - 1);
+  putJson();
+
+  jsonFile.ulFileSize = jsonFile.curReadPosn;
+  jsonFile.curReadPosn = 0;
+  jsonFile.fileBuf = jsonBuf;
+
+  return &jsonFile;
 }

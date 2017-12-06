@@ -14,67 +14,13 @@
 #include "FreeRTOS_Sockets.h"
 
 #include "server/FreeRTOS_server_private.h"
+#include "server/server.h"
 
 // Main page data
-#include "server/webpage_data.c"
 
 // To make the code more readable
 #define pcCOMMAND_BUFFER	pxClient->pxParent->pcCommandBuffer
 
-////////////////////////////////////////////////////////////////////////////////
-// File manipulation decls
-////////////////////////////////////////////////////////////////////////////////
-size_t ff_fread(void *outBuf, const size_t itemSize, 
-                const size_t itemCount, FF_FILE *file) {
-  // Determine how much to read
-  const BaseType_t avail = file->ulFileSize - file->curReadPosn;
-  if (avail <= 0) {
-    return 0;
-  }
-
-  // Read up to the smaller of (buffer or available)
-  const BaseType_t reqReadSize = itemSize * itemCount;
-  const BaseType_t readSize = reqReadSize < avail ? reqReadSize : avail;
-
-  memcpy(outBuf, file->fileBuf + file->curReadPosn, readSize);
-  file->curReadPosn += readSize;
-
-  return readSize;
-}
-
-/**
- * \brief Opens the main page file
- * \return Pointer to a file
- */
-FF_FILE *ff_fopen_main() {
-  static FF_FILE file;
-  file = (FF_FILE) {
-    .fileBuf = index_min_html_gz_dat,
-    .curReadPosn = 0,
-    .ulFileSize = index_min_html_gz_dat_len
-  };
-  return &file;
-}
-
-/**
- * \brief Opens the board status file. It is generated from the buffers and alarm status
- * \return Pointer to a file
- */
-FF_FILE *ff_fopen_json() {
-  static const char json[] = 
-      "HTTP/1.0 200 OK\r\n"
-      "Content-Type: application/json; charset=utf-8\r\n"
-      "Connection: close\r\n"
-      "\r\n"
-      "{\"measurements\":{\"bloodPressure\":[{\"syst\":120,\"dias\":80},{\"syst\":120,\"dias\":80},{\"syst\":120,\"dias\":80},{\"syst\":120,\"dias\":80},{\"syst\":120,\"dias\":80},{\"syst\":120,\"dias\":80},{\"syst\":120,\"dias\":80},{\"syst\":120,\"dias\":80}],\"temperature\":[98.99,98.6,98.6,105.4,105.4,105.4,105.4,105.4],\"pulseRate\":[60,70,80,105,105,105,105,105],\"ECG\":[104,104,104,104,104,104,104,104]},\"warningAlarm\":{\"bpOutOfRange\":false,\"tempOutOfRange\":false,\"pulseOutOfRange\":false,\"bpHighAlarm\":false,\"tempHighAlarm\":false,\"pulseLowAlarm\":false,\"battLowAlarm\":false},\"boardState\":{\"displayEnabled\":false}}";
-  static FF_FILE file;
-  file = (FF_FILE) {
-    .fileBuf = json,
-    .curReadPosn = 0,
-    .ulFileSize = ((sizeof(json)) - 1)
-  };
-  return &file;
-}
 
 
 /**

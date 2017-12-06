@@ -111,8 +111,7 @@ static ControllerData uiCtrlData      = {0};  ///< ui controller task data
 static SerialCommData serialData      = {0};  ///< ui controller task data
 static MeasureEKGData measEKGData     = {0};  ///< EKG measure task data
 static ComputeEKGData compEKGData     = {0};  ///< EKG compute task data
-//static const TaskHandle_t *serverData = &taskHandles[sysTCB_SERVER];
-#define serverData (&taskHandles[sysTCB_SERVER])
+static IPTaskData_t ipTaskData        = {0};  ///< IP Task references
 
 /*****************************************************************************
  * Forward declarations of the external routines and initialization functions
@@ -167,7 +166,7 @@ TE(sysTCB_SERIAL    ,serial_comms, &serialData,    sysPRI_SERL,  sysSTK_SERL),
 TE(sysTCB_MEAS_EKG  ,measureEKG,   &measEKGData,   sysPRI_MEKG,  sysSTK_MEKG),
 TE(sysTCB_COMP_EKG  ,computeEKG,   &compEKGData,   sysPRI_CEKG,  sysSTK_CEKG),
 TE(sysTCB_CMD_PARSE ,cmdDispatch,  &cmdDispQueue,  sysPRI_PARSR, sysSTK_PARSR),
-TE(sysTCB_SERVER    ,ipServerTask, serverData,     sysPRI_SERVR, sysSTK_SERVR),
+TE(sysTCB_SERVER    ,ipServerTask, &ipTaskData,    sysPRI_SERVR, sysSTK_SERVR),
 };
 
 #undef TE
@@ -191,7 +190,6 @@ void initStaticTCBs() {
     curTaskStackStart += taskEntries[i].usStackDepth;
   }
 }
-
 
 /*
  * Static memory for the system tasks
@@ -330,6 +328,11 @@ void globalVarsAndBuffersInit() {
     .correctedBuffers = &correctedBuffers,
   };
 
+  // Initialize references for the ip task
+  ipTaskData = (IPTaskData_t) {
+    .correctedBuffers = &correctedBuffers,
+    .warnAlarms = &warningAlarmStates
+  };
 }
 
 /**

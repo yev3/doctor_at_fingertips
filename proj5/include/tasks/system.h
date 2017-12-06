@@ -3,7 +3,7 @@
 // Team "ARM Brewery" 
 // Edward Guevara, David Pierce, and Yevgeni Kamenski
 // 
-// tasks.h - 09/25/2017 5:17 PM
+// system.h - 09/25/2017 5:17 PM
 // Defines Task Control Data structures used by the task scheduler
 // 
 // This is free and unencumbered software released into the public domain.
@@ -14,7 +14,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
-#include "utils/lcd_print.h"
 
 // @formatter:off
 /******************************************************************************
@@ -337,6 +336,14 @@ typedef struct MeasureEKGData {
  * \brief EKGCOMPUTE data references
  */
 typedef struct ComputeEKGData {
-  EKGBuffer *ekgBuffer;                 ///< Raw circular buffers and indices
-  CorrectedBuffers *correctedBuffers;   ///< Raw circular buffers and indices
+  EKGBuffer *ekgBuffer;                 ///< EKG buffer for FFT
+  CorrectedBuffers *correctedBuffers;   ///< Corrected circular buffers and indices
 } ComputeEKGData;
+
+/**
+ * \brief References for the IP task
+ */
+typedef struct IPTaskData {
+  CorrectedBuffers *correctedBuffers;   ///< Corrected circular buffers and indices
+  WarningAlarmStates *warnAlarms;       ///< Warning and alarm references
+} IPTaskData_t;

@@ -220,6 +220,7 @@
     <ClInclude Include="include\utils\pulse_transducer.h" />
     <ClInclude Include="include\utils\sockcmdline.h" />
     <ClInclude Include="include\utils\speaker_control.h" />
+    <ClInclude Include="include\server\server.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\common\curseslib\ncurses.vcxproj">

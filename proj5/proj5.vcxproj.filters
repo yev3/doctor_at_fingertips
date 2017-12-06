@@ -143,6 +143,9 @@
     </ClInclude>
     <ClInclude Include="include\drivers\pressure_cuff.h" />
     <ClInclude Include="include\drivers\pulse_transducer.h" />
+    <ClInclude Include="include\server\server.h">
+      <Filter>includes\tasks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="tasks">
