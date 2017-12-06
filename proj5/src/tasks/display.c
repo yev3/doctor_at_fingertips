@@ -26,6 +26,7 @@
 
 #include "tasks/system.h"
 #include "utils/lcd_print.h"
+#include "drivers/pressure_cuff.h"
 
 #define MENU_LINE1 " MEASUREMENT SELECT  "
 #define DISP_LINE2 "---------------------"
@@ -107,9 +108,15 @@ void display(void *taskArg) {
       lcd_printf("Battery       %3d ", (int) *data->batteryPercentage);
       lcd_print("%");
 
+      if (*ui->cuffControl) {
       // Display cuff control on the LCD
-      lcd_set_cursor(lineno++, 1);
-      lcd_printf("Cuff Control:  %s ", *data->cuffControl  ? "ON" : "OFF");
+        lineno++;
+        lcd_set_cursor(lineno++, 1);
+        lcd_printf("Cuff Control:  ON");
+        lcd_set_cursor(lineno++, 0);
+        lcd_printf("Pressure: ");
+        lcd_print_float(GetPressure(), 4, 1);
+      }
     }
 
     vTaskSuspend(NULL);

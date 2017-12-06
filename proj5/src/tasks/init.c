@@ -32,8 +32,7 @@ static ushort rawBatteryState = 200;    ///< Raw battery state reading
 /*
  * Flags indicating the state of the blood pressure reading
  */
-static bool completedSystolicMeasure  = false;  ///< T when systolic read done
-static bool completedDiastolicMeasure = false;  ///< T when diastolic read done
+QueueHandle_t measurementCommands = NULL; ///< Queue of the measurement reqs
 
 /*
  * Corrected sensor readings
@@ -49,9 +48,10 @@ static WarningAlarmStates warningAlarmStates = { 0 };
 /*
  * User interface controller state
  */
-static QueueHandle_t keyPressQueue;           ///< Queue of the pressed keys
-static bool auralAlarmSilenced = false;       ///< when true, alarm silenced
-static MeasureSelection measureSelection = MEASURE_PRESSURE; ///< cur measure
+static QueueHandle_t keyPressQueue = NULL;           ///< Queue of the pressed keys
+static bool auralAlarmSilenced = false;              ///< when true, alarm silenced
+static bool cuffControl = false;
+static MeasureSelection measureSelection = MEASURE_NONE; ///< cur measure
 
 /*
  * EKG measurements and flag when measurement completes
@@ -71,19 +71,29 @@ static QueueHandle_t cmdDispQueue = NULL; ///< Command dispatch queue
 static StaticQueue_t queueStaticBlockBuf[sysQUEUE_STATIC_COUNT];
 static uint8_t queueStatBufKeys[sysQUEUE_LEN_KEYS * sizeof(KeyPress_t)];
 static uint8_t queueStatBufCmds[sysQUEUE_LEN_CMD_PARSE * sizeof(SysCommand_t)];
+static uint8_t queueStatBufMeasure[sysQUEUE_LEN_MEASURE * sizeof(MeasureSelection)];
 
 void initStaticQueues() {
+  // Queue for key strokes
   keyPressQueue = xQueueCreateStatic(sysQUEUE_LEN_KEYS,
                                      sizeof(KeyPress_t),
                                      queueStatBufKeys,
                                      &queueStaticBlockBuf[0]);
 
+  // Queue for system commands from website and telnet
   cmdDispQueue = xQueueCreateStatic(sysQUEUE_LEN_CMD_PARSE,
                                      sizeof(SysCommand_t),
                                      queueStatBufCmds,
                                      &queueStaticBlockBuf[1]);
+
+  measurementCommands = xQueueCreateStatic(sysQUEUE_LEN_MEASURE,
+                                           sizeof(MeasureSelection),
+                                           queueStatBufMeasure,
+                                           &queueStaticBlockBuf[2]);
+
   configASSERT(keyPressQueue);
-  configASSERT(keyPressQueue);
+  configASSERT(cmdDispQueue);
+  configASSERT(measurementCommands);
 }
 
 
@@ -256,9 +266,7 @@ void globalVarsAndBuffersInit() {
   // Initialize the Measure data pointers
   measureData = (MeasureData) {
     .rawBuffers = &rawBuffers,
-    .completedSystolic = &completedSystolicMeasure,
-    .completedDiastolic = &completedDiastolicMeasure,
-    .measurementSelection = &measureSelection,
+    .measurementCommands = &measurementCommands
   };
 
   // Initialize the Compute data pointers
@@ -267,13 +275,13 @@ void globalVarsAndBuffersInit() {
     .batteryState = &rawBatteryState,
     .correctedBuffers = &correctedBuffers,
     .batteryPercentage = &batteryPercentage,
-    .measurementSelection = &measureSelection,
   };
 
   // Display View model initialization
   dispviewModel = (DispViewModel_t) {
     .mode = MENU_DISP_MODE,
     .scrollPosn = 0,
+    .cuffControl = &cuffControl
   };
 
   // Initialize the display data pointers
@@ -286,10 +294,10 @@ void globalVarsAndBuffersInit() {
   // Initialize the warning data pointers
   alarmWarnData = (EnunciateData) {
     .correctedBuffers = &correctedBuffers,
-    .measurementSelection = &measureSelection,
     .batteryPercentage = &batteryPercentage,
     .warningAlarmStates = &warningAlarmStates,
     .soundAlarmSilenced = &auralAlarmSilenced,
+    .measurementSelection = &measureSelection
   };
 
   // Initialize the status data pointers
@@ -298,9 +306,10 @@ void globalVarsAndBuffersInit() {
   // Initialize the ui controller data pointers
   uiCtrlData = (ControllerData) {
     .keyPressQueueHandle = keyPressQueue,
+    .measurementQueue = measurementCommands,
     .viewModel = &dispviewModel,
-    .measureSelect = &measureSelection,
     .auralAlarmSilenced = &auralAlarmSilenced,
+    .cuffControl = &cuffControl
   };
 
   // Initialize the warning data pointers

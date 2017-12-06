@@ -18,6 +18,7 @@
  */
 #include <drivers/pulse_transducer.h>
 #include <utils/uartstdio.h>
+#include "drivers/pressure_cuff.h"
 
 void keypad_init() {
   // Enable the peripherals used by the application.
@@ -173,3 +174,47 @@ void serial_init() {
   // Configure the UART for 115,200, 8-N-1 operation.
   UARTStdioConfig(0, 115200, SysCtlClockGet());
 }
+
+///**
+// * \brief timer that constantly checks the simulated pressure of the cuff
+// */
+//void PressureCuffHandler(void)
+//{
+//  // Clear the timer interrupt.
+//  TimerIntClear(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
+//
+//  //compute and check if pressure is within Systolic measurement range
+//  float pressure = currentPressure * 2.0 + 9.0;
+//  if(pressure >110.0 && pressure < 150.0) measureSystolic = true;
+//  else measureSystolic = false;
+//
+//  //compute and check if pressure is within Diastolic measurement range
+//  pressure = currentPressure * 1.5 + 6;
+//  if(pressure > 50.0 && pressure < 80.0) measureDiastolic = true;
+//  else measureDiastolic = false;
+//}
+//
+///**
+// * \brief Initializes the pulse measurement driver
+// */
+//void pressure_cuff_init() {
+//  // 5ms intervals to check the pressure of the cuff
+//  ulong clockPerSec = SysCtlClockGet() / 1000 * PRESSURE_TIMER_DEFAULT;
+//
+//  // Enable the timer peripheral
+//  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER2);
+//
+//  // Enable processor interrupts.
+//  IntMasterEnable();
+//
+//  // Configure 32-bit periodic timer.
+//  TimerConfigure(TIMER2_BASE,  TIMER_CFG_32_BIT_PER);
+//  TimerLoadSet(TIMER2_BASE, TIMER_A, clockPerSec);
+//
+//  // Setup the interrupt for the timer timeout.
+//  IntEnable(INT_TIMER2A);
+//  TimerIntEnable(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
+//
+//  // Enable the timer.
+//  TimerEnable(TIMER2_BASE, TIMER_A);
+//}

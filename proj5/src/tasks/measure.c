@@ -43,82 +43,39 @@ bool processTempMeasure(RawBuffers *buf) {
   return true;
 }
 
-/**
- * \brief Increments the variable by 3 every even numbered time the function
- * is called and decrements by 1 every odd numbered time the function is 
- * called until the value of the variable exceeds 100.  At such time, 
- * sets a variable indicating that the systolic pressure measurement is 
- * complete. The number 0 is considered to be even. When the diastolic 
- * measurement is complete, repeat the process. 
- * \param p current raw pressure value 
- * \return next generated pressure value
- */
-uint genSystP(uint p) {
-  static bool isEvenCall = false;    ///< true every other call, first call even
+static bool systolicMeasured = false;
+static bool diastolicMeasured = false;
+static uint systolicMeasurement;
+static uint diastolicMeasurement;
 
-  // set this call to be the opposite of the previous even/odd call state
-  isEvenCall = !isEvenCall;
-
-  // Even calls increment the pressure by 3
-  // Odd calls decrement the pressure by 1
-  return isEvenCall ? (p + 3) : (p - 1);
+static void measureSystolic() {
+  systolicMeasured = true;
+  diastolicMeasured = false;
+  systolicMeasurement = (uint)GetPressure();
 }
 
-/**
- * \brief Decrements the variable by 2 every even numbered time the function 
- * is called and increments by 1 every odd numbered time the function is 
- * called until the value of the variable drops below 40.  At such time, 
- * sets a variable indicating that the diastolic pressure measurement 
- * is complete. The number 0 is considered to be even. When the 
- * systolic measurement is complete, repeats the process. 
- * \param p current raw diastolic pressuve value
- * \return next generated diastolic pressure value
- */
-uint genDiastP(uint p) {
-  static bool isEvenCall = false; ///< true every other call, first call is even
-
-  // set this call to be the opposite of the previous even/odd call state
-  isEvenCall = !isEvenCall;
-
-  // Even calls decrement the pressure by 2
-  // Odd calls increment the pressure by 1
-  return isEvenCall ? (p - 2) : (p + 1);
+static void measureDiastolic() {
+  if (systolicMeasured) {
+    diastolicMeasured = true;
+    diastolicMeasurement = (uint)GetPressure();
+  }
 }
 
-/**
- * \brief Processes the pressure measurements into the raw buffers
- * \param measureData Used for flags to see when sys and dias are complete
- * \param buf raw curcular buffer to store the collected measurements
- * \return True when completed
- */
-bool processPressureMeasure(MeasureData *measureData, RawBuffers *buf) {
-  //check if pressure can be measured
-  if(beginPressureMeasurement && (measureSystolic || measureDiastolic)) {
+static bool recordRawPressureMeasurements(RawBuffers *buf) {
+  if (systolicMeasured && diastolicMeasured) {
+    systolicMeasured = false;
+    diastolicMeasured = false;
     // determine the old and new array indices in the buffer
-    uint oldSysIdx = buf->pressureIndex;
-    uint newSysIdx = (oldSysIdx + 1) % BUF_SIZE;
-    uint oldDiaIdx = oldSysIdx + BUF_SIZE;
+    uint newSysIdx = (buf->pressureIndex + 1) % BUF_SIZE;
     uint newDiaIdx = newSysIdx + BUF_SIZE;
 
     // update the last written circ buffer index
-    buf->pressureIndex = (uchar) newSysIdx;
-    float *pressure = GetPressure();
-    // measure Systolic pressure when ready
-    if (measureSystolic) {
-      buf->pressures[newSysIdx] = *pressure;
-      buf->pressures[newDiaIdx] = buf->pressures[oldDiaIdx];
-      measureSystolic = false;
-    }
-      // measure Diastolic pressure when ready
-    else if (measureDiastolic) {
-      buf->pressures[newSysIdx] = buf->pressures[oldSysIdx];
-      buf->pressures[newDiaIdx] = *pressure;
-      measureDiastolic = false;
-    }
-    beginPressureMeasurement = false;
+    buf->pressures[newSysIdx] = systolicMeasurement;
+    buf->pressures[newDiaIdx] = diastolicMeasurement;
+    buf->pressureIndex = (uchar)newSysIdx;
+    return true;
   }
-
-  return true;
+  return false;
 }
 
 /******************************************************************************
@@ -175,19 +132,30 @@ static bool processPulseRate(RawBuffers *buf) {
  * \param rawData raw data passed by the task scheduler
  */
 void measure(void *rawData) {
+  MeasureData *data = (MeasureData *) rawData;
+  RawBuffers *buf = data->rawBuffers;
+  QueueHandle_t measureCmds = *data->measurementCommands;
+  MeasureSelection requestedMeasurement;
+
   for(;;) {
-    // Get the flags and raw buffer data
-    MeasureData *data = (MeasureData *) rawData;
-    RawBuffers *buf = data->rawBuffers;
+    if (xQueueReceive(measureCmds, &requestedMeasurement,
+      portMAX_DELAY) == pdPASS) {
 
-    bool measurementComplete = false;  ///< Flag to determine when completed
+      bool measurementComplete = false;  ///< Flag to determine when completed
 
-    // Process the measurement based on the user's selection
-    switch (*data->measurementSelection) {
-      case MEASURE_PRESSURE:
+      // Process the measurement based on the user's selection
+      switch (requestedMeasurement) {
+      case MEASURE_PRESSURE_SYST: {
         // Process raw pressure data and store in the next circ buf location
-        measurementComplete = processPressureMeasure(data, buf);
+        measureSystolic();
         break;
+      }
+      case MEASURE_PRESSURE_DIAS: {
+        // Process raw pressure data and store in the next circ buf location
+        measureDiastolic();
+        measurementComplete = recordRawPressureMeasurements(buf);
+        break;
+      }
       case MEASURE_TEMPERATURE:
         // Process raw temperature data and store in the next circ buf location
         measurementComplete = processTempMeasure(buf);
@@ -199,16 +167,14 @@ void measure(void *rawData) {
       default:
         configASSERT(0);
         break;
-    }
+      }
 
-    // When measurement is completed, suspend measure task in schedule
-    // and schedule the compute task. Otherwise, this method will keep being
-    // scheduled for execution
-    if (measurementComplete) {
-      taskScheduleForExec(sysTCB_COMPUTE);
-      vTaskSuspend(NULL);
+      // When measurement is completed, suspend measure task in schedule
+      // and schedule the compute task. Otherwise, this method will keep being
+      // scheduled for execution
+      if (measurementComplete) {
+        taskScheduleForExec(sysTCB_COMPUTE);
+      }
     }
-
-//    vTaskDelay(pdMS_TO_TICKS(1));
   }
 }

@@ -22,13 +22,12 @@
 #include "tasks/commands.h"
 #include "tasks/system.h"
 #include "server/FreeRTOS_TCP_server.h"
+#include <drivers/pressure_cuff.h>
 
 /**
  * \brief Initializes the board hardware peripherals
  */
 void initializeHardwarePeriph();
-
-
 
 int main(void) {
   // Initialize board hardware

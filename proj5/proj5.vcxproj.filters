@@ -293,6 +293,9 @@
     <ClCompile Include="src\utils\cmd_parser.c">
       <Filter>utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\utils\pressure_cuff.c">
+      <Filter>utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FreeRTOSConfig.h" />
@@ -882,6 +885,8 @@
     <ClInclude Include="include\server\webpage_data.c">
       <Filter>webserver</Filter>
     </ClInclude>
+    <ClInclude Include="include\drivers\pressure_cuff.h" />
+    <ClInclude Include="include\drivers\pulse_transducer.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="tasks">

@@ -20,20 +20,28 @@
 #include <driverlib/sysctl.h>
 #include <driverlib/timer.h>
 #include "utils/hardware_timer.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
 
-#define PRESSURE_MIN 20     /* in mmHg */
-#define PRESSURE_MAX 100    /* In mmHg */
-#define PRESSURE_PERCENT_STEP 0.10     /* Percent Increase/Decrease of pressure */
-#define PRESSURE_TIMER_DEFAULT 5     /* Number of samples to measure */
+typedef struct PressureCuffState{
+  bool measureSystolic;   ///< Flag to measure systolic
+  bool measureDiastolic;  ///< Flag to measure diastolic
+  bool begin;             ///< Flag to begin measuring pressure
+  float current;          ///< initial pressure
+}PressureCuffState_t;
 
-extern bool measureSystolic;
-extern bool measureDiastolic;
-extern bool beginPressureMeasurement;
+
+extern PressureCuffState_t pressureCuffState;
+extern QueueHandle_t measurementCommands;
+
+#define PRESSURE_MIN 20     /* Raw sensor units */
+#define PRESSURE_MAX 100    /* Raw sensor units */
 
 /**
  * \brief Initializes the pulse measurement driver
  */
-void pressure_cuff_init();
+//void pressure_cuff_init();
 
 /**
  * \brief Increases the pressure of the cuff by default percent step
@@ -53,4 +61,4 @@ void ResetPressure();
 /**
  * \brief Resets pressure to minimum pressure
  */
-float *GetPressure();
+float GetPressure();

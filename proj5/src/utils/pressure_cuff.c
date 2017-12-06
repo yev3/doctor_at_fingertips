@@ -11,53 +11,40 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "drivers/pressure_cuff.h"
+#include "utils/ustdlib.h"
+#include <stdint.h>
+#include "FreeRTOS_IP.h"
+#include "tasks/system.h"
 
-bool measureSystolic = false;   ///< Flag to measure systolic
-bool measureDiastolic = false;   ///< Flag to measure diastolic
-bool beginPressureMeasurement = false;   ///< Flag to begin measuring pressure
-static float currentPressure = PRESSURE_MIN;  ///< initial pressure
-/**
- * \brief timer that constantly checks the simulated pressure of the cuff
- */
-void PressureCuffHandler(void)
-{
-  // Clear the timer interrupt.
-  TimerIntClear(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
+PressureCuffState_t pressureCuffState = {
+  false, false, false, PRESSURE_MIN
+};
 
-  //compute and check if pressure is within Systolic measurement range
-  float pressure = currentPressure * 2.0 + 9.0;
-  if(pressure >110.0 && pressure < 150.0) measureSystolic = true;
-  else measureSystolic = false;
+// For readability
+#define cuff (pressureCuffState)
 
-  //compute and check if pressure is within Diastolic measurement range
-  pressure = currentPressure * 1.5 + 6;
-  if(pressure > 50.0 && pressure < 80.0) measureDiastolic = true;
-  else measureDiastolic = false;
+bool measureSystolic = false;                 ///< Flag to measure systolic
+float triggerPressure;
+//bool measureDiastolic = false;                ///< Flag to measure diastolic
+//bool beginPressureMeasurement = false;        ///< Flag to begin measuring pressure
+//static float currentPressure = PRESSURE_MIN;  ///< initial pressure
+
+
+// Sends off a signal to measurement task for processing
+void TriggerMeasureInterrupt() {
+  MeasureSelection selection = 
+    measureSystolic ? MEASURE_PRESSURE_SYST : MEASURE_PRESSURE_DIAS;
+  xQueueSend(measurementCommands, &selection, portMAX_DELAY);
 }
 
-/**
- * \brief Initializes the pulse measurement driver
- */
-void pressure_cuff_init() {
-  // 5ms intervals to check the pressure of the cuff
-  ulong clockPerSec = SysCtlClockGet() / 1000 * PRESSURE_TIMER_DEFAULT;
+// Interrupt will randomly trigger between 75-90 raw
+void randSyst() {
+  triggerPressure = 75.0 + ((float)(uint32_t)urand() * 15.0 / (float)UINT32_MAX);
+}
 
-  // Enable the timer peripheral
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER2);
-
-  // Enable processor interrupts.
-  IntMasterEnable();
-
-  // Configure 32-bit periodic timer.
-  TimerConfigure(TIMER2_BASE,  TIMER_CFG_32_BIT_PER);
-  TimerLoadSet(TIMER2_BASE, TIMER_A, clockPerSec);
-
-  // Setup the interrupt for the timer timeout.
-  IntEnable(INT_TIMER2A);
-  TimerIntEnable(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
-
-  // Enable the timer.
-  TimerEnable(TIMER2_BASE, TIMER_A);
+// Interrupt will randomly trigger between 33-53 raw
+void randDias() {
+  triggerPressure = 33.0 + ((float)(uint32_t)urand() * 20.0 / (float)UINT32_MAX);
 }
 
 /**
@@ -65,37 +52,49 @@ void pressure_cuff_init() {
  */
 void IncreasePressure(){
   // increase pressure by percent step
-  currentPressure += currentPressure * PRESSURE_PERCENT_STEP;
+  cuff.current *= 1.1;
 
-  //check if pressure is at maximum
-  if(PRESSURE_MAX < currentPressure) currentPressure = PRESSURE_MAX;
-  beginPressureMeasurement = false;
+  if (measureSystolic && cuff.current > triggerPressure) {
+    cuff.current = triggerPressure;
+    TriggerMeasureInterrupt();
+    measureSystolic = false;
+    randDias();
+  }
+
+  if(cuff.current > PRESSURE_MAX) 
+    cuff.current = PRESSURE_MAX;
 }
 
 /**
  * \brief Decreases the pressure of the cuff by default percent step
  */
 void DecreasePressure(){
-  currentPressure -= currentPressure * PRESSURE_PERCENT_STEP;
-  //measure when pressure is decreasing
-  beginPressureMeasurement = true;
+  cuff.current *= 0.9;
 
-  // check if pressure is at lowest
-  if(PRESSURE_MIN > currentPressure) {
-    currentPressure = PRESSURE_MIN;
-    // do not measure if Pressure is at minimum
-    beginPressureMeasurement = false;
+  if (!measureSystolic && cuff.current < triggerPressure) {
+    cuff.current = triggerPressure;
+    TriggerMeasureInterrupt();
+    measureSystolic = true;
+    randSyst();
   }
+
+  if(cuff.current < PRESSURE_MIN)
+    cuff.current = PRESSURE_MIN;
 }
+
 
 /**
  * \brief Resets pressure to minimum pressure
  */
 void ResetPressure() {
-  currentPressure = PRESSURE_MIN;
+  cuff.current = PRESSURE_MIN;
+  measureSystolic = true;
+  randSyst();
+  FreeRTOS_debug_printf(("Resetting pressure, will randomly trigger at %.2f\n",
+    triggerPressure));
 }
 
 /**
  * \brief Get current pressure of the cuff
  */
-float *GetPressure() { return &currentPressure; }
+float GetPressure() { return cuff.current; }

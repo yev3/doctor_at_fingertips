@@ -47,7 +47,7 @@ bool pSysNormal(const float *pSys) {
  * @return true if the pressure is >20% above accepted limit
  */
 bool pSysHighAlarm(const float *pSys) {
-  float pressure = 9 + 2.0f * (*GetPressure());
+  float pressure = 9 + 2.0f * (*pSys);
   return ( pressure >= SYS_PRESS_NORMAL_MAX * 1.2f);
 }
 
@@ -314,8 +314,11 @@ void updateCurrentAlarmState(EnunciateData *enunciateData) {
 
   // Determine the state of the system speaker from the last high BP reading
   // Only do that if the last measurement was pressure
+  /*
+   * TODO
+   */
   if (alarms->bpHighAlarm &&
-      (*enunciateData->measurementSelection & MEASURE_PRESSURE)) {
+      (*enunciateData->measurementSelection)) {
 
     *enunciateData->measurementSelection = MEASURE_NONE;
 

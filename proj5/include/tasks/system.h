@@ -87,7 +87,8 @@ typedef enum {
  */
 #define sysQUEUE_LEN_KEYS       5
 #define sysQUEUE_LEN_CMD_PARSE 10
-#define sysQUEUE_STATIC_COUNT   2
+#define sysQUEUE_LEN_MEASURE    4
+#define sysQUEUE_STATIC_COUNT   3
 
 
 /**
@@ -95,12 +96,11 @@ typedef enum {
  */
 typedef enum MeasureSelection_t {
   MEASURE_NONE        = 0,
-  MEASURE_BEGIN       = (1<<0),
-  MEASURE_PRESSURE    = (1<<0),  ///< Blood pressure measurement selection
-  MEASURE_TEMPERATURE = (1<<1),  ///< Temperature measurement selection
-  MEASURE_PULSE       = (1<<2),  ///< Pulse rate measurement selection
-  MEASURE_EKG         = (1<<3),  ///< EKG measurement selection
-  MEASURE_END         = (1<<4),
+  MEASURE_PRESSURE_SYST    = (1<<0),  ///< Measure systolic pressure
+  MEASURE_PRESSURE_DIAS    = (1<<1),  ///< Measure diastolic pressure
+  MEASURE_TEMPERATURE      = (1<<2),  ///< Temperature measurement selection
+  MEASURE_PULSE            = (1<<3),  ///< Pulse rate measurement selection
+  MEASURE_EKG              = (1<<4),  ///< EKG measurement selection
 } MeasureSelection;
 
 // @formatter:on
@@ -230,10 +230,7 @@ typedef struct EKGBuffer {
  */
 typedef struct MeasureData {
   RawBuffers *rawBuffers;                 ///< Raw circular buffers and indices
-  bool *completedSystolic;                ///< T when systolic read done
-  bool *completedDiastolic;               ///< T when diastolic read done
-  MeasureSelection *measurementSelection; ///< User's selected measurement
-  uint *currentPressure;
+  QueueHandle_t *measurementCommands;      ///< Requested measurements from ui
 } MeasureData;
 
 /**
@@ -278,7 +275,6 @@ typedef struct EnunciateData {
   bool *soundAlarmSilenced;       ///< True when user acknowledges the alarm
 } EnunciateData;
 
-
 /**
  * \brief Used by the serial communications module
  */
@@ -296,8 +292,7 @@ typedef enum DisplayMode_t {
 typedef struct DisplayViewModel_t {
   DisplayMode mode;                  ///< Current display mode
   int scrollPosn;                    ///< User's current scroll posn
-  bool *cuffControl;                  ///< toggle pressure control of cuff
-  uint *currentPressure;              ///< percent applied pressure
+  bool *cuffControl;                 ///< toggle pressure control of cuff
 } DispViewModel_t;
 
 /**
@@ -314,15 +309,15 @@ typedef struct DisplayData {
  */
 typedef struct ControllerData {
   QueueHandle_t keyPressQueueHandle;  ///< User's key presses
+  QueueHandle_t measurementQueue;     ///< Measurement select queue
   DispViewModel_t *viewModel;         ///< Display View Model
   MeasureSelection *measureSelect;    ///< User's selected measurement
 
   // Hook to call when alarm is ACKed
   // TODO
 
-  bool *auralAlarmSilenced;       ///< True when user acknowledges the alarm
+  bool *auralAlarmSilenced;           ///< True when user acknowledges the alarm
   bool *cuffControl;                  ///< toggle pressure control of cuff
-  uint *currentPressure;              ///< percent applied pressure
 } ControllerData;
 
 /**

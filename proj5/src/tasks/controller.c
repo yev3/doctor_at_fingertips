@@ -16,6 +16,7 @@
 #include "tasks/system.h"
 #include "tasks/commands.h"
 #include "FreeRTOS_IP.h"
+#include <drivers/pressure_cuff.h>
 
 #define NSCROLL 4   /* Number of items available in the menu */
 
@@ -27,6 +28,7 @@
 void uiControl(void *rawData) {
   ControllerData *data = (ControllerData *) rawData;
   QueueHandle_t keyPresses = data->keyPressQueueHandle;
+  QueueHandle_t measQueue = data->measurementQueue;
   DispViewModel_t *ui = data->viewModel;
   KeyPress_t key;
 
@@ -39,14 +41,17 @@ void uiControl(void *rawData) {
       }
 
       // Mode selection is toggled by the right key
-      if (cmdKEY_RIGHT == key) {
-        ui->mode = (MENU_DISP_MODE == ui->mode)
-                          ? ENUNCIATE_DISP_MODE
-                          : MENU_DISP_MODE;
-      }
+      //if (cmdKEY_RIGHT == key) {
+      //  ui->mode = (MENU_DISP_MODE == ui->mode)
+      //                    ? ENUNCIATE_DISP_MODE
+      //                    : MENU_DISP_MODE;
+      //}
 
       if (MENU_DISP_MODE == ui->mode) {
         // Menu mode
+        if (cmdKEY_RIGHT == key) {
+          ui->mode = ENUNCIATE_DISP_MODE;
+        }
 
         // Scroll up when the up key is pressed
         if (cmdKEY_UP == key && (ui->scrollPosn > 0)) {
@@ -58,52 +63,54 @@ void uiControl(void *rawData) {
           ++(ui->scrollPosn);
         }
 
+        MeasureSelection measureSelection = MEASURE_NONE;
         if (cmdKEY_SELECT == key) {
           switch (ui->scrollPosn) {
-          case 0:
-            *data->measureSelect = MEASURE_PRESSURE;
+          case 0: {
+            ResetPressure();
+            *data->cuffControl = true;
             break;
-          case 1:
-            *data->measureSelect = MEASURE_TEMPERATURE;
+          }
+          case 1: {
+            measureSelection = MEASURE_TEMPERATURE;
             break;
-          case 2:
-            *data->measureSelect = MEASURE_PULSE;
+          }
+          case 2: {
+            measureSelection = MEASURE_PULSE;
             break;
-          case 3 :
-            *data->measureSelect = MEASURE_EKG;
+          }
+          case 3 : {
+            taskScheduleForExec(sysTCB_MEAS_EKG);
             break;
+          }
           default:
             break;
+          }
+          
+          if(measureSelection != MEASURE_NONE) {
+            xQueueSend(measQueue, &measureSelection, portMAX_DELAY);
           }
 
           // place into enunciate mode after measurement was selected
           ui->mode = ENUNCIATE_DISP_MODE;
 
-          //schedule measure EKG task when EKG is chosen
-          if(MEASURE_EKG == *data->measurementSelection)
-            taskScheduleForExec(sysTCB_MEAS_EKG);
-          //schedule measure task when a measurement is chosen
-          else
-            taskScheduleForExec(sysTCB_MEASURE);
         }
 
       } else {
         // Enunciate mode
-        // Increase Pressure when the up key is pressed
-        if (keys->keyPressedUp && *data->cuffControl) {
-          IncreasePressure();
-
-          //schedule measure task when pressure changes
-          *data->measurementSelection = MEASURE_PRESSURE;
-          taskScheduleForExec(sysTCB_MEASURE);
+        if (cmdKEY_RIGHT == key) {
+          ui->mode = MENU_DISP_MODE;
         }
-
-        // Decrease pressure when the down key is pressed
-        if (keys->keyPressedDown && *data->cuffControl) {
-          DecreasePressure();
-          //schedule measure task when pressure changes
-          *data->measurementSelection = MEASURE_PRESSURE;
-          taskScheduleForExec(sysTCB_MEASURE);
+        if (*data->cuffControl) {
+          if (cmdKEY_RIGHT == key) {
+            *data->cuffControl = false;
+          } else if (cmdKEY_UP == key || cmdKEY_DOWN == key) {
+            if (cmdKEY_UP == key) {
+              IncreasePressure();
+            } else {
+              DecreasePressure();
+            }
+          }
         }
       }
 

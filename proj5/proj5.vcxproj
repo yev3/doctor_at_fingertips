@@ -351,6 +351,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\utils\optfft.c" />
+    <ClCompile Include="src\utils\pressure_cuff.c" />
     <ClCompile Include="src\utils\pulse_transducer.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -653,6 +654,8 @@
     <ClInclude Include="..\common\include\utils\ustdlib.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="include\drivers\pressure_cuff.h" />
+    <ClInclude Include="include\drivers\pulse_transducer.h" />
     <ClInclude Include="include\hardware_port.h" />
     <ClInclude Include="include\FreeRTOSConfig.h" />
     <ClInclude Include="include\FreeRTOSIPConfig.h" />
