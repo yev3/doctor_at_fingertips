@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConsoleLoggerLib", "..\comm
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConsoleLoggerHelper", "..\common\SecondConsoleLogger\ConsoleLoggerHelper\ConsoleLoggerHelper.vcxproj", "{9C7FC746-9DC9-49B2-A880-0B75CCECB1B9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtos", "win32RTOS\win32RTOS-proj5.vcxproj", "{3AF982E7-0DF9-426C-94B4-B44B06D3C985}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -49,6 +51,12 @@ Global
 		{9C7FC746-9DC9-49B2-A880-0B75CCECB1B9}.Release|x64.ActiveCfg = Release|Win32
 		{9C7FC746-9DC9-49B2-A880-0B75CCECB1B9}.Release|x86.ActiveCfg = Release|Win32
 		{9C7FC746-9DC9-49B2-A880-0B75CCECB1B9}.Release|x86.Build.0 = Release|Win32
+		{3AF982E7-0DF9-426C-94B4-B44B06D3C985}.Debug|x64.ActiveCfg = Debug|Win32
+		{3AF982E7-0DF9-426C-94B4-B44B06D3C985}.Debug|x86.ActiveCfg = Debug|Win32
+		{3AF982E7-0DF9-426C-94B4-B44B06D3C985}.Debug|x86.Build.0 = Debug|Win32
+		{3AF982E7-0DF9-426C-94B4-B44B06D3C985}.Release|x64.ActiveCfg = Release|Win32
+		{3AF982E7-0DF9-426C-94B4-B44B06D3C985}.Release|x86.ActiveCfg = Release|Win32
+		{3AF982E7-0DF9-426C-94B4-B44B06D3C985}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

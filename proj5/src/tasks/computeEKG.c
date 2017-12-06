@@ -13,6 +13,7 @@
 #include <math.h>
 #include "utils/optfft.h"
 #include "tasks/system.h"
+#include "RTOSDebugTrace.h"
 
 /**
  * \brief When available, the ComputeEKG task will take the data acquired by
@@ -22,15 +23,31 @@
  */
 
 void computeEKG(void* rawData) {
+  ComputeEKGData *data = (ComputeEKGData *) rawData;
+
+  // EKG real and imag buffers
+  int *realBuffer = data->ekgBuffer->ekgMeasures;
   static int imagBuffer[BUF_SIZE_EKG] = {0};
-  while (1) {
-    ComputeEKGData *data = (ComputeEKGData *) rawData;
-    EKGBuffer *ekgBuffer = data->ekgBuffer;
-    CorrectedBuffers *correctedBuffers = data->correctedBuffers;
-    for(uint i = 0; i < BUF_SIZE_EKG; i++) imagBuffer[i] = 0;
+
+  // storage loc
+  CorrectedBuffers *correctedBuffers = data->correctedBuffers;
+
+  for(;;) {
+    FreeRTOS_debug_printf(("Starting EKG Compute\n"));
+    // Clear the imaginary buffer
+    memset(imagBuffer, 0, BUF_SIZE_EKG * sizeof(imagBuffer[0]));
+
     //evaluated using optfft function in the optfft.c file
-    correctedBuffers->ekgFrequency[++correctedBuffers->ekgIndex] =
-            optfft(ekgBuffer->ekgMeasures, imagBuffer);
+    const int ekgFreq = optfft(realBuffer, imagBuffer); 
+
+    // Index of the next storage loc
+    const int i = ((correctedBuffers->ekgIndex + 1) % BUF_SIZE);
+
+    // Store the result in the cir
+    correctedBuffers->ekgFrequency[i] = ekgFreq;
+    correctedBuffers->ekgIndex = i;
+
+    FreeRTOS_debug_printf(("EKG Compute done, scheduling display\n"));
 
     // when done computing frequency of EKG, suspend ComputeEKG Task
     taskScheduleForExec(sysTCB_DISPLAY);

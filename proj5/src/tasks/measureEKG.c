@@ -18,11 +18,9 @@
 #include <driverlib/timer.h>
 #include <math.h>
 #include "tasks/system.h"
+#include "RTOSDebugTrace.h"
 
 #define PI 3.14159265354f
-
-static float ekgMeasurement = 0;
-
 
 /**
  * \brief The MeasureEKG task will measure the current EKG measurement that is
@@ -31,19 +29,20 @@ static float ekgMeasurement = 0;
  */
 
 void measureEKG(void* rawData) {
+  MeasureEKGData *data = (MeasureEKGData *) rawData;
+  EKGBuffer *ekgBuffer = data->ekgBuffer;
   for (;;) {
-    MeasureEKGData *data = (MeasureEKGData *) rawData;
-    EKGBuffer *ekgBuffer = data->ekgBuffer;
+
     float w = 2 * PI * 1000;
     float t = 0;
     for (uint i = 0; i < BUF_SIZE_EKG; i++) {
       ekgBuffer->ekgMeasures[i] = (int)(30.0*sin(w*t));
       t += 0.000125;
     }
+
+    FreeRTOS_debug_printf(("EKG Measured, scheduling EKG compute..\n"));
     // when done measuring, call ComputeEKG to get frequency
-    if(*data->completedEKGMeasure) {
-      taskScheduleForExec(sysTCB_COMP_EKG);
-      vTaskSuspend(NULL);
-    }
+    taskScheduleForExec(sysTCB_COMP_EKG);
+    vTaskSuspend(NULL);
   }
 }

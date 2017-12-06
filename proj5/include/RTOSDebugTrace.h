@@ -7,13 +7,13 @@
 
 int lTraceLoggingPrintf( const char *pcFormatString, ... );
 
-#if( ipconfigHAS_DEBUG_PRINTF == 1 )
+//#if( ipconfigHAS_DEBUG_PRINTF == 1 )
 #define FreeRTOS_debug_printf(X)	lTraceLoggingPrintf X
-#endif
+//#endif
 
-#if( ipconfigHAS_PRINTF == 1 )
+//#if( ipconfigHAS_PRINTF == 1 )
 #define FreeRTOS_printf(X)			lTraceLoggingPrintf X
-#endif
+//#endif
 
 
 #endif //EX_COMMS_RTOSDEBUGTRACE_H

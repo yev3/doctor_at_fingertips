@@ -322,14 +322,12 @@ void globalVarsAndBuffersInit() {
   // Initialize the EKG measurements pointers
   measEKGData = (MeasureEKGData) {
     .ekgBuffer = &ekgBuffer,
-    .completedEKGMeasure = &completedEKGMeasure
   };
 
   // Initialize the EKG measurements pointers
   compEKGData = (ComputeEKGData) {
     .ekgBuffer = &ekgBuffer,
     .correctedBuffers = &correctedBuffers,
-    .completedEKGMeasure = &completedEKGMeasure
   };
 
 }

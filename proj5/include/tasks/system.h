@@ -213,7 +213,7 @@ typedef struct CorrectedBuffers {
   float temperatures[BUF_SIZE];       ///< Corrected Temperature in deg C
   float pressures[2 * BUF_SIZE];      ///< Corrected pressures in mmHg
   float pulseRates[BUF_SIZE];         ///< Corrected Pulse Rate in BPM
-  float ekgFrequency[2 * BUF_SIZE];   ///< Corrected EKG measurements
+  int ekgFrequency[BUF_SIZE];         ///< Corrected EKG measurements
   uchar temperatureIndex;             ///< Current corrected temp buffer index
   uchar pressureIndex;                ///< Current corrected pres buffer index
   uchar pulseRateIndex;               ///< Current corrected PR buffer index
@@ -222,7 +222,6 @@ typedef struct CorrectedBuffers {
 
 typedef struct EKGBuffer {
   int ekgMeasures[BUF_SIZE_EKG];  ///< Raw EKG reading buffer
-  uchar ekgIndex;                 ///< Current raw EKG buffer index
 } EKGBuffer;
 
 /**
@@ -332,7 +331,6 @@ typedef struct StatusData {
  */
 typedef struct MeasureEKGData {
   EKGBuffer *ekgBuffer;                 ///< Raw circular buffers and indices
-  bool *completedEKGMeasure;            ///< T when measurement is done
 } MeasureEKGData;
 
 /**
@@ -341,5 +339,4 @@ typedef struct MeasureEKGData {
 typedef struct ComputeEKGData {
   EKGBuffer *ekgBuffer;                 ///< Raw circular buffers and indices
   CorrectedBuffers *correctedBuffers;   ///< Raw circular buffers and indices
-  bool *completedEKGMeasure;            ///< F when computation is done
 } ComputeEKGData;

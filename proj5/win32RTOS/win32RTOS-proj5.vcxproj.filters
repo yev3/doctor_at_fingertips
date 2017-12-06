@@ -1,0 +1,788 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="deps">
+      <UniqueIdentifier>{b1502669-2c63-4f7e-8e42-5ae4db3e92eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\driverlib">
+      <UniqueIdentifier>{27c2f7ef-3d3b-4d25-8207-7b5202be031b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\sysutils">
+      <UniqueIdentifier>{4717d172-e022-4958-9b78-725ab91bcd54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\FreeRTOS">
+      <UniqueIdentifier>{ad956001-93ff-43f5-8855-cf134cf16e44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\FreeRTOS\include">
+      <UniqueIdentifier>{327ae775-f6c7-40ad-acb9-55be2c312a72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\FreeRTOS\portable">
+      <UniqueIdentifier>{db8b4192-2a3e-4abf-8665-896c3b2f4b5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\FreeRTOS-TCP">
+      <UniqueIdentifier>{82787a1b-12f3-4d67-b2e0-5100de144b75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\FreeRTOS-TCP\include">
+      <UniqueIdentifier>{9518ce30-221e-4d7f-b9cf-f2fac79b3928}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\FreeRTOS-TCP\portable">
+      <UniqueIdentifier>{57967fc5-437b-4e73-b90d-43e459015481}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\sysinc">
+      <UniqueIdentifier>{5b063d72-3f98-4bd8-a232-631e21e58323}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\utils\RTOSDebugTraceWindows.c">
+      <Filter>deps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\utils\RTOSIPTrace.c">
+      <Filter>deps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\adc.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\can.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\comp.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\cpu.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\eeprom.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\epi.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\ethernet.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\fan.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\flash.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\fpu.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\gpio.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\hibernate.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\i2c.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\i2s.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\interrupt.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\lpc.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\mpu.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\peci.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\pwm.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\qei.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\rit128x96x4.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\ssi.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\sysctl.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\sysexc.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\systick.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\timer.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\uart.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\udma.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\usb.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\driverlib\watchdog.c">
+      <Filter>deps\driverlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\cmdline.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\cpu_usage.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\crc.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\flash_pb.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\fswrapper.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\isqrt.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\locator.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\lwiplib.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\ptpdlib.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\ringbuf.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\scheduler.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\sine.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\softi2c.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\softssi.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\softuart.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\swupdate.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\tftp.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\uartstdio.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\include\utils\ustdlib.c">
+      <Filter>deps\sysutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS\Source\croutine.c">
+      <Filter>deps\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS\Source\event_groups.c">
+      <Filter>deps\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS\Source\list.c">
+      <Filter>deps\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS\Source\queue.c">
+      <Filter>deps\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS\Source\tasks.c">
+      <Filter>deps\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS\Source\timers.c">
+      <Filter>deps\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS\Source\portable\MemMang\heap_4.c">
+      <Filter>deps\FreeRTOS\portable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS\Source\portable\MSVC-MingW\port.c">
+      <Filter>deps\FreeRTOS\portable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\FreeRTOS_ARP.c">
+      <Filter>deps\FreeRTOS-TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\FreeRTOS_DHCP.c">
+      <Filter>deps\FreeRTOS-TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\FreeRTOS_DNS.c">
+      <Filter>deps\FreeRTOS-TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\FreeRTOS_IP.c">
+      <Filter>deps\FreeRTOS-TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\FreeRTOS_Sockets.c">
+      <Filter>deps\FreeRTOS-TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\FreeRTOS_Stream_Buffer.c">
+      <Filter>deps\FreeRTOS-TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\FreeRTOS_TCP_IP.c">
+      <Filter>deps\FreeRTOS-TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\FreeRTOS_TCP_WIN.c">
+      <Filter>deps\FreeRTOS-TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\FreeRTOS_UDP_IP.c">
+      <Filter>deps\FreeRTOS-TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\BufferManagement\BufferAllocation_2.c">
+      <Filter>deps\FreeRTOS-TCP\portable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\NetworkInterface\WinPCap\NetworkInterface.c">
+      <Filter>deps\FreeRTOS-TCP\portable</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\RTOSDebugTrace.h">
+      <Filter>deps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\RTOSIPTrace.h">
+      <Filter>deps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\adc.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\can.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\comp.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\cpu.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\debug.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\eeprom.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\epi.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\ethernet.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\fan.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\flash.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\fpu.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\gpio.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\hibernate.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\i2c.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\i2s.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\interrupt.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\lpc.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\mpu.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\peci.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\pin_map.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\pwm.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\qei.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\rit128x96x4.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\rom.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\rom_map.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\rtos_bindings.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\ssi.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\sysctl.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\sysexc.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\systick.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\timer.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\uart.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\udma.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\usb.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\driverlib\watchdog.h">
+      <Filter>deps\driverlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\cmdline.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\cpu_usage.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\crc.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\flash_pb.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\fswrapper.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\isqrt.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\locator.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\lwiplib.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\ptpdlib.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\ringbuf.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\scheduler.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\sine.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\softi2c.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\softssi.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\softuart.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\swupdate.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\tftp.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\uartstdio.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\utils\ustdlib.h">
+      <Filter>deps\sysutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS\Source\include\croutine.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS\Source\include\deprecated_definitions.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS\Source\include\event_groups.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS\Source\include\FreeRTOS.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS\Source\include\list.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS\Source\include\mpu_prototypes.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS\Source\include\mpu_wrappers.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS\Source\include\portable.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS\Source\include\projdefs.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS\Source\include\queue.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS\Source\include\semphr.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS\Source\include\StackMacros.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS\Source\include\task.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS\Source\include\timers.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS\Source\portable\MSVC-MingW\portmacro.h">
+      <Filter>deps\FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\FreeRTOSIPConfigDefaults.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\FreeRTOS_ARP.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\FreeRTOS_DHCP.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\FreeRTOS_DNS.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\FreeRTOS_errno_TCP.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\FreeRTOS_IP.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\FreeRTOS_IP_Private.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\FreeRTOS_Sockets.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\FreeRTOS_Stream_Buffer.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\FreeRTOS_TCP_IP.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\FreeRTOS_TCP_WIN.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\FreeRTOS_UDP_IP.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\IPTraceMacroDefaults.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\NetworkBufferManagement.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include\NetworkInterface.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC\pack_struct_end.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC\pack_struct_start.h">
+      <Filter>deps\FreeRTOS-TCP\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\asmdefs.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\arm_cmse.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\arm_interrupt.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\arm_itm.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\arm_neon.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\assert.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\cmsis_iar.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\complex.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\ctype.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\DLib_Config_Full.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\DLib_Config_Normal.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\DLib_Defaults.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\DLib_float_setup.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\DLib_Product.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\DLib_Product_fenv.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\DLib_Product_stdlib.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\DLib_Product_string.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\DLib_Threads.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\errno.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\fenv.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\float.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\iar_dlmalloc.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\iar_dynamic_init.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\intrinsics.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\inttypes.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\io_macros.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\iso646.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\limits.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\locale.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\LowLevelIOInterface.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\math.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\setjmp.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\signal.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\stdalign.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\stdarg.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\stdatomic.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\stdbool.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\stddef.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\stdint.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\stdio.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\stdlib.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\stdnoreturn.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\string.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\target.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\tgmath.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\threads.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\time.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\time32.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\time64.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\uchar.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\wchar.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\wctype.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\xatomic.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\xctype.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\xlocale_alconv.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\xlocale_lconv.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\xtgmath.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\ycheck.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\yfuns.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\ysizet.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\c\yvals.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_adc.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_can.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_comp.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_eeprom.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_epi.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_ethernet.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_fan.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_flash.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_gpio.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_hibernate.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_i2c.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_i2s.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_ints.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_lpc.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_memmap.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_nvic.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_peci.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_pwm.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_qei.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_ssi.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_sysctl.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_sysexc.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_timer.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_types.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_uart.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_udma.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_usb.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\hw_watchdog.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\include\inc\lm3s8962.h">
+      <Filter>deps\sysinc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\common\include\driverlib\readme.txt">
+      <Filter>deps\driverlib</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
