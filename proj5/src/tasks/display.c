@@ -6,20 +6,20 @@
 // display.c - 09/26/2017 5:32 PM
 // The purpose of this file is to display the measurements to the user's LCD
 // in the format described below:
-// ╔═════════════════════╗
+// ╔═════════════════════════╗
 // ║ Syst / Diast        ║ 0
 // ║ ####   #####   mmHg ║ 1
 // ║                     ║ 2
 // ║ Temperature ###.# *C║ 3
 // ║ Pulse rate  ###.#   ║ 4
-// ║ Battery     ###   % ║ 5
-// ║                     ║ 6
+// ║ EKG         ###.# Hz║ 5
+// ║ Battery     ###   % ║ 6
 // ║                     ║ 7
-// ║                     ║ 8
+// ║ Cuff Control:  ON   ║ 8
 // ║                     ║ 9
 // ║                     ║ 10
 // ║                     ║ 11
-// ╚═════════════════════╝
+// ╚═════════════════════════╝
 //
 // This is free and unencumbered software released into the public domain.
 ////////////////////////////////////////////////////////////////////////////////
@@ -33,6 +33,7 @@
 #define MENU_LINE3 "   Blood Pressure    "
 #define MENU_LINE4 "   Temperature       "
 #define MENU_LINE5 "   Heart Rate        "
+#define MENU_LINE6 "   EKG               "
 
 #define ENUN_LINE1 "    DEVICE STATUS    "
 
@@ -67,6 +68,7 @@ void display(void *taskArg) {
         lcd_printf_at(lineno++, 0, MENU_LINE3);
         lcd_printf_at(lineno++, 0, MENU_LINE4);
         lcd_printf_at(lineno++, 0, MENU_LINE5);
+        lcd_printf_at(lineno++, 0, MENU_LINE6);
         lcd_printf_at(2 + ui->scrollPosn, 0, MENU_LEADR);
       }
     } else {
@@ -94,10 +96,20 @@ void display(void *taskArg) {
       lcd_printf("Pulse rate  ");
       lcd_print_float(buf->pulseRates[buf->pulseRateIndex], 5, 1);
 
+      // Display EKG frequency information on the LCD
+      lcd_set_cursor(lineno++, 1);
+      lcd_printf("EKG Freq    ");
+      lcd_print_float(buf->ekgFrequency[buf->ekgIndex], 5, 1);
+      lcd_printf(" Hz");
+
       // Display battery state information on the LCD
       lcd_set_cursor(lineno++, 1);
       lcd_printf("Battery       %3d ", (int) *data->batteryPercentage);
       lcd_print("%");
+
+      // Display cuff control on the LCD
+      lcd_set_cursor(lineno++, 1);
+      lcd_printf("Cuff Control:  %s ", *data->cuffControl  ? "ON" : "OFF");
     }
 
     vTaskSuspend(NULL);

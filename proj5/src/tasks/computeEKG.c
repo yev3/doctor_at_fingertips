@@ -27,17 +27,13 @@ void computeEKG(void* rawData) {
     ComputeEKGData *data = (ComputeEKGData *) rawData;
     EKGBuffer *ekgBuffer = data->ekgBuffer;
     CorrectedBuffers *correctedBuffers = data->correctedBuffers;
-    if((*data->completedEKGMeasure)) {
-      for(uint i = 0; i < BUF_SIZE_EKG; i++) imagBuffer[i] = 0;
-      //evaluated using optfft function in the optfft.c file
-      correctedBuffers->ekgFrequency[correctedBuffers->ekgIndex++] = optfft(ekgBuffer->ekgMeasures, imagBuffer);
-      
-      // when done computing frequency of EKG, delay EKG measurement
-      // and start again
-      *data->completedEKGMeasure = false;
-      vTaskDelay(pdMS_TO_TICKS(5000));
-      taskScheduleForExec(sysTCB_MEAS_EKG);
-      vTaskSuspend(NULL);
-    }
+    for(uint i = 0; i < BUF_SIZE_EKG; i++) imagBuffer[i] = 0;
+    //evaluated using optfft function in the optfft.c file
+    correctedBuffers->ekgFrequency[++correctedBuffers->ekgIndex] =
+            optfft(ekgBuffer->ekgMeasures, imagBuffer);
+
+    // when done computing frequency of EKG, suspend ComputeEKG Task
+    taskScheduleForExec(sysTCB_DISPLAY);
+    vTaskSuspend(NULL);
   }
 }

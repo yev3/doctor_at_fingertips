@@ -79,9 +79,6 @@ void initializeHardwarePeriph() {
     // Initialize temperature sensor
     temperature_init();
 
-    //    // Initialize simulated EKG measurement interrupt
-    //    measure_ekg_init();
-
     // Initialize the system timer
     Timer1InitDefault();
 
@@ -90,6 +87,9 @@ void initializeHardwarePeriph() {
 
     // Initialize the hardware timer to simulate the pulse transducer driver
     pulse_init();
+
+    // Initialize hardware timer to simulate pressure cuff
+    pressure_cuff_init();
 
     // Initialize the onboard OLED display
     lcd_init();

@@ -19,7 +19,7 @@
 #include <math.h>
 #include "tasks/system.h"
 
-#define PI 3.1417f
+#define PI 3.14159265354f
 
 static float ekgMeasurement = 0;
 
@@ -40,7 +40,6 @@ void measureEKG(void* rawData) {
       ekgBuffer->ekgMeasures[i] = (int)(30.0*sin(w*t));
       t += 0.000125;
     }
-    *data->completedEKGMeasure = true;
     // when done measuring, call ComputeEKG to get frequency
     if(*data->completedEKGMeasure) {
       taskScheduleForExec(sysTCB_COMP_EKG);

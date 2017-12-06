@@ -17,7 +17,7 @@
 #include "tasks/commands.h"
 #include "FreeRTOS_IP.h"
 
-#define NSCROLL 3   /* Number of items available in the menu */
+#define NSCROLL 4   /* Number of items available in the menu */
 
 /**
  * \brief Processes key presses or other user input and takes appropriate
@@ -69,6 +69,9 @@ void uiControl(void *rawData) {
           case 2:
             *data->measureSelect = MEASURE_PULSE;
             break;
+          case 3 :
+            *data->measureSelect = MEASURE_EKG;
+            break;
           default:
             break;
           }
@@ -76,12 +79,32 @@ void uiControl(void *rawData) {
           // place into enunciate mode after measurement was selected
           ui->mode = ENUNCIATE_DISP_MODE;
 
+          //schedule measure EKG task when EKG is chosen
+          if(MEASURE_EKG == *data->measurementSelection)
+            taskScheduleForExec(sysTCB_MEAS_EKG);
           //schedule measure task when a measurement is chosen
-          taskScheduleForExec(sysTCB_MEASURE);
+          else
+            taskScheduleForExec(sysTCB_MEASURE);
         }
 
       } else {
         // Enunciate mode
+        // Increase Pressure when the up key is pressed
+        if (keys->keyPressedUp && *data->cuffControl) {
+          IncreasePressure();
+
+          //schedule measure task when pressure changes
+          *data->measurementSelection = MEASURE_PRESSURE;
+          taskScheduleForExec(sysTCB_MEASURE);
+        }
+
+        // Decrease pressure when the down key is pressed
+        if (keys->keyPressedDown && *data->cuffControl) {
+          DecreasePressure();
+          //schedule measure task when pressure changes
+          *data->measurementSelection = MEASURE_PRESSURE;
+          taskScheduleForExec(sysTCB_MEASURE);
+        }
       }
 
       // User pressed a key, so update the display
