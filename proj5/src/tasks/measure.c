@@ -15,16 +15,13 @@
 #include "drivers/pressure_cuff.h"
 #include "driverlib/adc.h"
 #include "tasks/system.h"
-#include "hardware_port.h"
 
-/*******************************************************************************
- * Initialization of Temperature Sensor
- ******************************************************************************/
 
 /*******************************************************************************
  * Temperature measurement section
  ******************************************************************************/
 
+extern uint getRawTempVal();
 
 /**
  * \brief Measure temperature from chip sensor.

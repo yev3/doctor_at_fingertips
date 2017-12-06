@@ -10,10 +10,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "types.h"
+#include <stdint.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+
+typedef unsigned int uint;
+typedef unsigned char uchar;
+typedef unsigned short ushort;
+typedef unsigned long ulong;
 
 // @formatter:off
 /******************************************************************************
@@ -156,6 +161,9 @@ extern void led_init();
 
 // Initializes the network stack
 extern void network_init();
+
+// Resets
+extern void network_reset();
 
 /**
  * \brief Init all global variables, TCB structures & underlying data pointers.

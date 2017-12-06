@@ -201,7 +201,6 @@
   <ItemGroup>
     <ClInclude Include="include\drivers\pressure_cuff.h" />
     <ClInclude Include="include\drivers\pulse_transducer.h" />
-    <ClInclude Include="include\hardware_port.h" />
     <ClInclude Include="include\FreeRTOSConfig.h" />
     <ClInclude Include="include\FreeRTOSIPConfig.h" />
     <ClInclude Include="include\ranges.h" />
@@ -210,8 +209,6 @@
     <ClInclude Include="include\server\webpage_data.c" />
     <ClInclude Include="include\tasks\commands.h" />
     <ClInclude Include="include\tasks\system.h" />
-    <ClInclude Include="include\types.h" />
-    <ClInclude Include="include\utils\cmd_dispatch.h" />
     <ClInclude Include="include\utils\float_print.h" />
     <ClInclude Include="include\utils\hardware_timer.h" />
     <ClInclude Include="include\utils\lcd_print.h" />

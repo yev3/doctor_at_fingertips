@@ -18,7 +18,6 @@
 #include <driverlib/pwm.h>
 #include <driverlib/gpio.h>
 #include <driverlib/sysctl.h>
-#include "types.h"
 
 /**
  * \brief Initializes the PWM port (G)

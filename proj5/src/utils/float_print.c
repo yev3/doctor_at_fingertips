@@ -19,7 +19,8 @@
  * \param padding total padding of the value
  * \param precision number of precision digits after the decimal point
  */
-int sprint_float(char *buf, ulong n, double val, int padding, int precision) {
+int sprint_float(char *buf, unsigned long n, 
+                 double val, int padding, int precision) {
   // determine number of chars not including the nullterm char
   if (n == 0) return 0;
   int bufRemain = (int) (n - 1);
@@ -56,7 +57,7 @@ int sprint_float(char *buf, ulong n, double val, int padding, int precision) {
   val += rounding;
 
   // Extract the integer part of the value
-  ulong intPart = (ulong) val;
+  unsigned long intPart = (unsigned long) val;
   double remainder = val - (double) intPart;
 
   // determine value of digits required
@@ -102,7 +103,7 @@ int sprint_float(char *buf, ulong n, double val, int padding, int precision) {
   // Extract digits from the remaing fraction part and output it
   while (precision-- > 0 && bufRemain-- > 0) {
     remainder *= 10.0;
-    uint toPrint = (unsigned int) (remainder) % 10;
+    unsigned int toPrint = (unsigned int) (remainder) % 10;
     *writeBuf++ = (char) (toPrint + '0');
     remainder -= toPrint;
     padding--;

@@ -11,7 +11,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <types.h>
+#include <stdint.h>
 
 /******************************************************************************
  * Public interface functions and constants related to system timing
@@ -20,7 +20,7 @@
 /**
  * \brief Global tick counter type
  */
-typedef ullong system_tick_t;
+typedef unsigned long long system_tick_t;
 
 /**
  * \brief Hook for any additional actions each hardware tick
@@ -62,7 +62,7 @@ void SysTickHookClear();
  * \brief Initialize the hardware timer
  * \param tickDurationMs desired hardware tick duration in milliseconds
  */
-void Timer1Init(ulong tickDurationMs);
+void Timer1Init(unsigned long tickDurationMs);
 
 /**
  * \brief Initializes the hardware tick timer using default tick duration

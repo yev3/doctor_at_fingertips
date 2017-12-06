@@ -12,9 +12,7 @@
 
 #include <string.h>
 #include <math.h>
-#include "types.h"
 #include "utils/ustdlib.h"
-#include "hardware_port.h"
 
 /**
  * \brief Prints a formatted floating point number to the buffer, to overcome
@@ -25,4 +23,4 @@
  * \param padding total padding of the number
  * \param precision number of precision digits after the decimal point
  */
-int sprint_float(char* buf, ulong n, double val, int padding, int precision);
+int sprint_float(char* buf, unsigned long n, double val, int padding, int precision);

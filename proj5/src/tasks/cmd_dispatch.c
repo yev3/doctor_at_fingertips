@@ -1,6 +1,6 @@
 /*****************************************************************************
  *                                                                           *
- * Project ?, CPSC 5530 Embedded Systems, Seattle University, 2017           *
+ * Project 5, CPSC 5530 Embedded Systems, Seattle University, 2017           *
  * Team "ARM Brewery": Edward Guevara, David Pierce, and Yevgeni Kamenski    *
  *                                                                           *
  * cmd_dispatch.c - 11/26/2017                                               *
@@ -21,6 +21,7 @@
 #include "FreeRTOS_IP.h"
 #include "tasks/system.h"
 #include "tasks/commands.h"
+#include "utils/lcd_print.h"
 
 static QueueHandle_t cmdQueue = NULL;
 
@@ -46,17 +47,57 @@ void cmdDispatch(void *pvParameters) {
     if (xStatus == pdPASS) {
       switch (receivedCmd.cmd) {
 
-        case SCMD_RESET_NETWORK:FreeRTOS_debug_printf(("Reset\n"));
+        // Resets the network connection by re-initializing the IP stack
+        case SCMD_RESET_NETWORK: {
+          FreeRTOS_debug_printf(("Network Reset\n"));
+          network_reset();
           break;
+        }
+
+        // Start the measuring tasks. 
+        // They listen for measuring commands in the queue
         case SCMD_START:FreeRTOS_debug_printf(("Start\n"));
+        {
+          taskScheduleForExec(sysTCB_MEASURE);
+          taskScheduleForExec(sysTCB_MEAS_EKG);
           break;
-        case SCMD_STOP:FreeRTOS_debug_printf(("Stop\n"));
+          
+        }
+
+        // Suspend the measuring tasks. they are not able to listen 
+        // for measuring commands from the user's UI
+        case SCMD_STOP: {
+          FreeRTOS_debug_printf(("Stop\n"));
+          taskSuspend(sysTCB_MEASURE);
+          taskSuspend(sysTCB_MEAS_EKG);
           break;
+        }
+        
+        // Turns the display on or off
         case SCMD_DISPLAY_EN: {
           SCDisplayArgsEnum_t arg = (SCDisplayArgsEnum_t)(BaseType_t) receivedCmd.arg;
           FreeRTOS_debug_printf(("Display=%d\n", arg));
-        }
+          switch (arg) {
+            case SC_ARG_DISP_ON: {
+              taskScheduleForExec(sysTCB_DISPLAY);
+              break;
+            }
+
+            case SC_ARG_DISP_OFF: {
+              taskSuspend(sysTCB_DISPLAY);
+              lcd_clear();
+              break;
+            }
+
+            default: break;
+          }
           break;
+        }
+
+        default: {
+          FreeRTOS_debug_printf(("Unknown command received, can't dispatch"));
+          break;
+        }
       }
 
     } else {

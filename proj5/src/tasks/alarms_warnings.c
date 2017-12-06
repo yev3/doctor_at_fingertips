@@ -20,11 +20,12 @@
 #include "tasks/system.h"
 #include "ranges.h"
 #include "inc/lm3s8962.h"
-#include "types.h"
 #include "utils/led_control.h"
 #include "utils/speaker_control.h"
 #include "utils/hardware_timer.h"
 #include "drivers/pressure_cuff.h"
+
+typedef unsigned long long ullong;
 
 /******************************************************************************
  *

@@ -1,3 +1,14 @@
+////////////////////////////////////////////////////////////////////////////////
+// Project 5, CPSC 5530 Embedded Systems, Seattle University
+// Team "ARM Brewery" 
+// Edward Guevara, David Pierce, and Yevgeni Kamenski
+// 
+// webpage_data.c
+// Compressed gzipped main HTML page. Includes the header:
+// HTTP/1.0 200 OK// Content-Type: text / html; charset = UTF - 8// Content-Length: 6003// Content-Encoding : gzip// Connection : close
+//
+// This is free and unencumbered software released into the public domain.
+////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
 static const unsigned char index_min_html_gz_dat[] = {

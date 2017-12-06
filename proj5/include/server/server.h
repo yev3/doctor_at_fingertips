@@ -1,4 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////
+// Project 5, CPSC 5530 Embedded Systems, Seattle University
+// Team "ARM Brewery" 
+// Edward Guevara, David Pierce, and Yevgeni Kamenski
+// 
+// server.h 
+// Defines server-specific routines handles.
+// 
+// This is free and unencumbered software released into the public domain.
+////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
 #include <FreeRTOS.h>

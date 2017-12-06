@@ -2,7 +2,7 @@
  * Project 5, CPSC 5530 Embedded Systems, Seattle University, 2017           *
  * Team "ARM Brewery": Edward Guevara, David Pierce, and Yevgeni Kamenski    *
  *                                                                           *
- * pressure_cuff.c - 10/21/2017                                                *
+ * pressure_cuff.c - 10/21/2017                                              *
  * PWM speaker init and beep on/off functions                                *
  *                                                                           *
  * "THE BEER-WARE LICENSE" (Revision 42):                                    *

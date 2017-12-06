@@ -29,7 +29,7 @@ void SysTickHookClear() {}
  * \brief Initialize the hardware timer
  * \param tickDurationMs desired hardware tick duration in milliseconds
  */
-void Timer1Init(ulong tickDurationMs){}
+void Timer1Init(unsigned long tickDurationMs){}
 
 /**
  * \brief Initializes the hardware tick timer using default tick duration
@@ -198,7 +198,7 @@ void NetworkGetMAC(uint8_t *ucMACAddress) {
 ////////////////////////////////////////////////////////////////////////////////
 // ADC
 ////////////////////////////////////////////////////////////////////////////////
-uint getRawTempVal() {
+unsigned int getRawTempVal() {
   return 25 + urand() % 50;
 }
 

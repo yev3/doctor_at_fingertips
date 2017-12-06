@@ -114,9 +114,6 @@
     <ClInclude Include="include\utils\lcd_print.h">
       <Filter>includes\utils</Filter>
     </ClInclude>
-    <ClInclude Include="include\types.h">
-      <Filter>includes</Filter>
-    </ClInclude>
     <ClInclude Include="include\utils\speaker_control.h">
       <Filter>includes\utils</Filter>
     </ClInclude>
@@ -125,12 +122,6 @@
     </ClInclude>
     <ClInclude Include="include\tasks\commands.h">
       <Filter>includes\tasks</Filter>
-    </ClInclude>
-    <ClInclude Include="include\hardware_port.h">
-      <Filter>includes</Filter>
-    </ClInclude>
-    <ClInclude Include="include\utils\cmd_dispatch.h">
-      <Filter>includes\utils</Filter>
     </ClInclude>
     <ClInclude Include="include\server\FreeRTOS_server_private.h">
       <Filter>includes\webserver</Filter>

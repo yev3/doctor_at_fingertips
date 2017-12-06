@@ -19,9 +19,10 @@
 
 #pragma once
 
-#include <portmacro.h>
 #include <stdbool.h>
+#include <stdint.h>
 
+// Types of key presses
 typedef enum {
   cmdKEY_UP,
   cmdKEY_DOWN,
@@ -30,19 +31,22 @@ typedef enum {
   cmdKEY_SELECT,
 } KeyPress_t;
 
+// Commands that are dispatched from the network task
 typedef enum {
-  SCMD_RESET_NETWORK,
-  SCMD_START,
-  SCMD_STOP,
-  SCMD_DISPLAY_EN,
+  SCMD_RESET_NETWORK, // i command
+  SCMD_START,         // s command
+  SCMD_STOP,          // p command
+  SCMD_DISPLAY_EN,    // d command
 } SysCommandsEnum_t;
 
+// Command to enqueue to the dispatcher
 typedef struct {
-  SysCommandsEnum_t cmd;
-  void * arg;
+  SysCommandsEnum_t cmd;  // Command
+  void * arg;             // Command arguments
 }SysCommand_t;
 
 
+// Arguments for the display command to turn on or off
 typedef enum SCDisplayArgsEnum_t{
   SC_ARG_DISP_ON = 1,
   SC_ARG_DISP_OFF = 0,
@@ -59,11 +63,12 @@ bool cmdEnqueue(SysCommandsEnum_t cmd_, void *arg_);
 //*****************************************************************************
 // Define some status codes to return when parsing commands. 
 //*****************************************************************************
-#define CMDLINE_BAD_CMD         (-1)
-#define CMDLINE_TOO_MANY_ARGS   (-2)
-#define CMDLINE_TOO_FEW_ARGS   (-3)
+#define CMDLINE_BAD_CMD       (-1)
+#define CMDLINE_TOO_MANY_ARGS (-2)
+#define CMDLINE_TOO_FEW_ARGS  (-3)
 #define CMDLINE_INVALID_ARG   (-4)
 
+// Buffer to place the output of the command
 typedef struct {
   char *const buf;    // Buffer
   const int capacity; // Max buffer size
@@ -94,9 +99,12 @@ tCmdLineEntry;
 //*****************************************************************************
 extern const tCmdLineEntry g_sCmdTable[];
 
-//*****************************************************************************
-// Prototypes for the APIs.
-//*****************************************************************************
+/**
+ * \brief Parses the command and dispatches an appropriate handler
+ * \param pcCmdLine command line to process
+ * \param outBuf where to put the result of the command
+ * \return result code
+ */
 extern int CmdLineProcess(char *pcCmdLine, CmdLineOutBuf_t *outBuf);
 
 // Processes the received command string
@@ -104,23 +112,3 @@ void consumeCommandBuffer(char *buf, int32_t lRecvSize,
                           CmdLineOutBuf_t *outBuf);
 
 
-//I The I command initializes the network communications between your system and the
-//browser page.
-
-//E The E error response is given for incorrect commands or non-existent commands.
-
-//S The S command indicates START mode. The command shall start the embedded
-//tasks by directing the hardware to initiate the measurement tasks. In doing so, the
-//command shall also enable all the interrupts.
-
-//P The P command indicates STOP mode. This command shall stop the embedded tasks
-//by terminating any running measurement tasks. Such an action shall disable any data
-//collecting interrupts.
-
-//D The D command enables or disables the local display.
-
-//M The M command. The M command requests the return of the most recent value(s) of
-//all measurement data.
-
-//W The W command. The W command requests the return of the most recent value(s) of
-//all warning and alarm data.

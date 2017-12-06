@@ -10,7 +10,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "types.h"
 
 #define LCD_CHAR_WIDTH 6U       /* LCD char width in px */
 #define LCD_CHAR_HEIGHT 8U      /* LCD char height in px */

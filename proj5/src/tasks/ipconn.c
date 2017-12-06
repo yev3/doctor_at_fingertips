@@ -21,7 +21,6 @@
 #include "server/server.h"
 #include "tasks/system.h"
 #include "tasks/commands.h"
-#include "hardware_port.h"
 
 // Compressed webpage data
 #include "server/webpage_data.c"
@@ -66,6 +65,8 @@ static CorrectedBuffers * correctedBuffers = NULL;
  */
 static WarningAlarmStates * warnAlarms = NULL;
 
+// Gets the network MAC
+extern void NetworkGetMAC(uint8_t *ucMACAddress);
 /**
  * \brief Initializes the network stack
  */
@@ -78,6 +79,15 @@ void network_init() {
 
   FreeRTOS_IPInit(ucIPAddress, ucNetMask, ucGatewayAddress,
     ucDNSServerAddress, ucMACAddress);
+}
+
+/**
+ * Resets the network
+ */
+void network_reset() {
+  FreeRTOS_IPInit(ucIPAddress, ucNetMask, ucGatewayAddress,
+    ucDNSServerAddress, ucMACAddress);
+  
 }
 
 /**
