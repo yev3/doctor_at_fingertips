@@ -1,11 +1,19 @@
+////////////////////////////////////////////////////////////////////////////////
+// Project 5, CPSC 5530 Embedded Systems, Seattle University
+// Team "ARM Brewery" 
+// Edward Guevara, David Pierce, and Yevgeni Kamenski
+// 
+// cmd_parser.c - 10/21/2017 4:06 PM
+// Responsible for parsing the user commands and controlling the board.
+// 
+// This is free and unencumbered software released into the public domain.
+////////////////////////////////////////////////////////////////////////////////
 
 #include "FreeRTOS.h"
 #include "task.h"
 #include "FreeRTOS_IP.h"
 #include "utils/ustdlib.h"
-#include "utils/sockcmdline.h"
 #include "tasks/commands.h"
-
 
 
 /**
@@ -27,8 +35,6 @@ static int execCmdStop(int argc, char *argv[], CmdLineOutBuf_t *const outBuf);
 static int execCmdDisp(int argc, char *argv[], CmdLineOutBuf_t *const outBuf);
 void showHelp(CmdLineOutBuf_t *const outBuf);
 int Cmd_help(int argc, char *argv[], CmdLineOutBuf_t *const outBuf);
-
-
 
 // Table of supported commands
 const tCmdLineEntry g_sCmdTable[] =

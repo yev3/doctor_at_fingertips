@@ -2,4 +2,6 @@
 #include <stdint.h>
 
 uint getRawTempVal();
-void NetworkGetMAC(uint8_t *ucMACAddress);
+
+// Gets the network MAC
+extern void NetworkGetMAC(uint8_t *ucMACAddress);

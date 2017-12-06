@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Project 3, CPSC 5530 Embedded Systems, Seattle University, 2017           *
+ * Project 5, CPSC 5530 Embedded Systems, Seattle University, 2017           *
  * Team "ARM Brewery": Edward Guevara, David Pierce, and Yevgeni Kamenski    *
  *                                                                           *
  * pulse_transducer.c - 9/30/2017                                            *

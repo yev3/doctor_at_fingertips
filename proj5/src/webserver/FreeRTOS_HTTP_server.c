@@ -57,7 +57,7 @@ FF_FILE *ff_fopen_main() {
 }
 
 /**
- * \brief Opens the board status file
+ * \brief Opens the board status file. It is generated from the buffers and alarm status
  * \return Pointer to a file
  */
 FF_FILE *ff_fopen_json() {

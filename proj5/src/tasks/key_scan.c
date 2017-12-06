@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Project 3, CPSC 5530 Embedded Systems, Seattle University, 2017           *
+ * Project 5, CPSC 5530 Embedded Systems, Seattle University, 2017           *
  * Team "ARM Brewery": Edward Guevara, David Pierce, and Yevgeni Kamenski    *
  *                                                                           *
  * key_scan.c - 10/14/2017                                                   *

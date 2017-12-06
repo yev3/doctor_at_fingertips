@@ -1,11 +1,20 @@
-// TODO Header
+////////////////////////////////////////////////////////////////////////////////
+// Project 5, CPSC 5530 Embedded Systems, Seattle University
+// Team "ARM Brewery" 
+// Edward Guevara, David Pierce, and Yevgeni Kamenski
+// 
+// ipconn.c
+// IP connectivity task. Defines functions for processing web page requests,
+// and handles telnet command line interface to control the board.
+// 
+// This is free and unencumbered software released into the public domain.
+////////////////////////////////////////////////////////////////////////////////
 
 /* Standard includes. */
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <inc/hw_types.h>
-#include <utils/sockcmdline.h>
 #include "utils/ustdlib.h"
 #include "utils/uartstdio.h"
 
@@ -25,40 +34,34 @@
 #include "FreeRTOS_IP_Private.h"
 #include "server/FreeRTOS_server_private.h"
 
-#define mainTCP_SERVER_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
+/**
+ * \brief Main server task. Blocks on IP events, waiting for connections.
+ * When connection is established, uses a socket set to monitor traffic
+ * events and dispatches the attached workers. Both webserver and telnet
+ * connections are thus handles by this single task
+ * \param pvParameters Passed parameters by the init task.
+ */
+void ipServerTask(void *pvParameters);
 
-/* The maximum time to wait for a closing socket to close. */
-#define ipconnSHUTDOWN_DELAY  ( pdMS_TO_TICKS( 5000 ) )
+/**
+ * \brief Worker for the telnet connection. Receives commands, parses
+ * them, and dispatches controls to the rest of the board. 
+ * \param pxTCPClient Connected client
+ * \return Socket read/write result
+ */
+static BaseType_t telnetWork(TCPClient_t *pxTCPClient);
 
-/* The standard echo port number. */
-#define ipconnLISTEN_PORT    10000
-
-/* If ipconfigUSE_TCP_WIN is 1 then the Tx sockets will use a buffer size set by
-ipconfigTCP_TX_BUFFER_LENGTH, and the Tx window size will be
-configECHO_SERVER_TX_WINDOW_SIZE times the buffer size.  Note
-ipconfigTCP_TX_BUFFER_LENGTH is set in FreeRTOSIPConfig.h as it is a standard TCP/IP
-stack constant, whereas configECHO_SERVER_TX_WINDOW_SIZE is set in
-FreeRTOSConfig.h as it is a demo application constant. */
-#ifndef configECHO_SERVER_TX_WINDOW_SIZE
-#define configECHO_SERVER_TX_WINDOW_SIZE  1
-#endif
-
-/* If ipconfigUSE_TCP_WIN is 1 then the Rx sockets will use a buffer size set by
-ipconfigTCP_RX_BUFFER_LENGTH, and the Rx window size will be
-configECHO_SERVER_RX_WINDOW_SIZE times the buffer size.  Note
-ipconfigTCP_RX_BUFFER_LENGTH is set in FreeRTOSIPConfig.h as it is a standard TCP/IP
-stack constant, whereas configECHO_SERVER_RX_WINDOW_SIZE is set in
-FreeRTOSConfig.h as it is a demo application constant. */
-#ifndef configECHO_SERVER_RX_WINDOW_SIZE
-#define configECHO_SERVER_RX_WINDOW_SIZE  1
-#endif
-
-/* Echo client task parameters - used for both TCP and UDP echo clients. */
-#define ipconnCLIENT_STACK_SIZE        ( configMINIMAL_STACK_SIZE * 2 )  /* Not used in the Windows port. */
-#define ipconnCLIENT_TASK_PRIORITY          ( tskIDLE_PRIORITY + 2 )
+/**
+ * \brief Server configuration. Web interface is on port 80, telnet
+ * command line interface is on port 23.
+ */
+static ServerConfig_t serverConfig[] = {
+  {serverTYPE_HTTP, 80, 3, xHTTPClientWork, vHTTPClientDelete},
+  {serverTYPE_TELNET, 23, 2, telnetWork, vHTTPClientDelete},
+};
 
 /*
- * Network Configuration Parameters
+ * Network Configuration Parameters.  These are used should DHCP fail.
  */
 static const uint8_t ucIPAddress[4] = { 169, 254, 163, 6 };
 static const uint8_t ucNetMask[4] = { 255, 255, 255, 0 };
@@ -66,18 +69,16 @@ static const uint8_t ucGatewayAddress[4] = { 192, 168, 1, 254 };
 static const uint8_t ucDNSServerAddress[4] = { 208, 67, 222, 222 };
 uint8_t ucMACAddress[8];
 
-// Gets the network MAC
-extern void NetworkGetMAC(uint8_t *ucMACAddress);
+/**
+ * \brief Server work task handle. Passed by the initialization task.
+ * Used to send the network up event, so that can create listening
+ * sockets.
+ */
+static TaskHandle_t serverWorkTaskHandle = NULL;
 
-// Processes the received command string
-extern void consumeCommandBuffer(char *buf, int32_t lRecvSize,
-                                 CmdLineOutBuf_t *outBuf);
-
-////////////////////////////////////////////////////////////////////////////////
-// 
-////////////////////////////////////////////////////////////////////////////////
-
-// Initializes the network stack
+/**
+ * \brief Initializes the network stack
+ */
 void network_init() {
   // Seed random number
   usrand(37);
@@ -89,6 +90,9 @@ void network_init() {
     ucDNSServerAddress, ucMACAddress);
 }
 
+/**
+ * \brief Used to help trace network connection problems
+ */
 void logNetworkConfig() {
   uint32_t ulIPAddress, ulNetMask, ulGatewayAddress, ulDNSServerAddress;
   char addrStrBuf[16];
@@ -113,12 +117,11 @@ void logNetworkConfig() {
 
 }
 
-/*-----------------------------------------------------------*/
-
-static TaskHandle_t serverWorkTaskHandle = NULL;
-
-/* Called by FreeRTOS+TCP when the network connects or disconnects.  Disconnect
-events are only received if implemented in the MAC driver. */
+/**
+ * \brief Called by FreeRTOS+TCP when the network connects or disconnects.
+ * Disconnect events are only received if implemented in the MAC driver. 
+ * \param eNetworkEvent Type of event that occurred
+ */
 void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
 {
 static BaseType_t xTasksAlreadyCreated = pdFALSE;
@@ -143,7 +146,13 @@ static BaseType_t xTasksAlreadyCreated = pdFALSE;
 	}
 }
 
-BaseType_t telnetWork( TCPClient_t *pxTCPClient ) 
+/**
+ * \brief Worker for the telnet connection. Receives commands, parses
+ * them, and dispatches controls to the rest of the board. 
+ * \param pxTCPClient Connected client
+ * \return Socket read/write result
+ */
+static BaseType_t telnetWork( TCPClient_t *pxTCPClient ) 
 {
   static char recvBuf[100];     // Received command buffer and size
   static const BaseType_t recvBufSize = sizeof(recvBuf);
@@ -197,12 +206,13 @@ BaseType_t telnetWork( TCPClient_t *pxTCPClient )
   return xRc;
 }
 
-
-static ServerConfig_t serverConfig[] = {
-  {serverTYPE_HTTP, 80, 3, xHTTPClientWork, vHTTPClientDelete},
-  {serverTYPE_TELNET, 23, 2, telnetWork, vHTTPClientDelete},
-};
-
+/**
+ * \brief Main server task. Blocks on IP events, waiting for connections.
+ * When connection is established, uses a socket set to monitor traffic
+ * events and dispatches the attached workers. Both webserver and telnet
+ * connections are thus handles by this single task
+ * \param pvParameters Passed parameters by the init task.
+ */
 void ipServerTask(void *pvParameters)
 {
   serverWorkTaskHandle = *(TaskHandle_t*)pvParameters;
@@ -222,105 +232,3 @@ void ipServerTask(void *pvParameters)
     FreeRTOS_TCPServerWork(pxTCPServer, xInitialBlockTime);
   }
 }
-
-
-/*-----------------------------------------------------------*/
-
-
-/* Stores the stack size passed into vStartSimpleTCPServerTasks() so it can be
-reused when the server listening task creates tasks to handle connections. */
-static uint16_t usUsedStackSize = 0;
-
-static void _prvServerConnectionInstance(void *pvParameters) {
-  static const TickType_t xReceiveTimeOut = pdMS_TO_TICKS(5000);
-  static const TickType_t xSendTimeOut = pdMS_TO_TICKS(5000);
-  TickType_t xTimeOnShutdown;
-
-  int32_t lRecvSize;    // Num bytes received from socket
-  int32_t lSent;
-  int32_t lTotalSent;
-
-
-  // Received command buffer and size
-  char recvBuf[100];
-  const BaseType_t recvBufSize = sizeof(recvBuf);
-
-  // Command response buffer
-  char respBuf[512];
-  CmdLineOutBuf_t outBuf = (CmdLineOutBuf_t) {
-    .buf = respBuf,
-    .capacity = sizeof(respBuf),
-    .len = 0
-  };
-
-  Socket_t xConnectedSocket = (Socket_t) pvParameters;
-
-  FreeRTOS_debug_printf(("Running new listening task ..\n"));
-
-  FreeRTOS_setsockopt(xConnectedSocket, 0, FREERTOS_SO_RCVTIMEO,
-                      &xReceiveTimeOut, sizeof(xReceiveTimeOut));
-
-  FreeRTOS_setsockopt(xConnectedSocket, 0, FREERTOS_SO_SNDTIMEO,
-                      &xSendTimeOut, sizeof(xReceiveTimeOut));
-
-  for (;;) {
-
-    // Receive command line
-    while (!(lRecvSize =
-               FreeRTOS_recv(xConnectedSocket, recvBuf, recvBufSize, 0))) {}
-
-    if (lRecvSize < 0) {
-      FreeRTOS_debug_printf(("Receive size invalid, timeout?\n"));
-      /* Socket closed? */
-      break;
-    }
-
-    consumeCommandBuffer(recvBuf, lRecvSize, &outBuf);
-
-    /* If there is data to send back */
-    if (outBuf.len > 0) {
-      lSent = 0;
-      lTotalSent = 0;
-
-      outBuf.buf[outBuf.capacity - 1] = '\0';
-      FreeRTOS_debug_printf(("Sending back:\n%s\n", outBuf.buf));
-
-      /* Call send() until all the data has been sent. */
-      while ((lSent >= 0) && (lTotalSent < outBuf.len)) {
-        lSent =
-          FreeRTOS_send(xConnectedSocket,
-                        outBuf.buf,
-                        outBuf.len - lTotalSent,
-                        0);
-        lTotalSent += lSent;
-      }
-
-      if (lSent < 0) {
-        /* Socket closed? */
-        break;
-      }
-    }
-  }
-
-  FreeRTOS_debug_printf(("Shutting down listening task ..\n"));
-
-  /* Initiate a shutdown in case it has not already been initiated. */
-  FreeRTOS_shutdown(xConnectedSocket, FREERTOS_SHUT_RDWR);
-
-  /* Wait for the shutdown to take effect, indicated by FreeRTOS_recv()
-  returning an error. */
-  xTimeOnShutdown = xTaskGetTickCount();
-  do {
-    if (FreeRTOS_recv(xConnectedSocket, recvBuf, recvBufSize, 0) < 0) {
-      break;
-    }
-  } while ((xTaskGetTickCount() - xTimeOnShutdown) < ipconnSHUTDOWN_DELAY);
-
-  /* Finished with the socket and the task. */
-  FreeRTOS_closesocket(xConnectedSocket);
-
-  vTaskDelete(NULL);
-}
-
-/*-----------------------------------------------------------*/
-
