@@ -66,18 +66,8 @@
 extern "C" {
 #endif
 
-#ifndef	FTP_SERVER_USES_RELATIVE_DIRECTORY
-	#define	FTP_SERVER_USES_RELATIVE_DIRECTORY		0
-#endif
-
-enum eSERVER_TYPE
-{
-	eSERVER_NONE,
-	eSERVER_HTTP,
-	eSERVER_FTP,
-};
-
-struct xFTP_CLIENT;
+typedef BaseType_t ( * FTCPWorkFunction ) ( struct xTCP_CLIENT * /* pxClient */ );
+typedef void ( * FTCPDeleteFunction ) ( struct xTCP_CLIENT * /* pxClient */ );
 
 #if( ipconfigFTP_HAS_RECEIVED_HOOK != 0 )
 	extern void vApplicationFTPReceivedHook( const char *pcFileName, uint32_t ulSize, struct xFTP_CLIENT *pxFTPClient );
@@ -101,44 +91,27 @@ struct xFTP_CLIENT;
 	extern BaseType_t xApplicationFTPPasswordHook( const char *pcUserName, const char *pcPassword );
 #endif /* ipconfigFTP_HAS_USER_PASSWORD_HOOK */
 
-#if( ipconfigFTP_HAS_USER_PROPERTIES_HOOK != 0 )
-	/*
-	 * The FTP server is asking for user-specific properties
-	 */
-	typedef struct
-	{
-		uint16_t usPortNumber;	/* For reference only. Host-endian. */
-		const char *pcRootDir;
-		BaseType_t xReadOnly;
-	}
-	FTPUserProperties_t;
-	extern void vApplicationFTPUserPropertiesHook( const char *pcUserName, FTPUserProperties_t *pxProperties );
-#endif /* ipconfigFTP_HAS_USER_PASSWORD_HOOK */
-
-#if( ipconfigHTTP_HAS_HANDLE_REQUEST_HOOK != 0 )
-	/*
-	 * A GET request is received containing a special character,
-	 * usually a question mark.
-	 * const char *pcURLData;	// A request, e.g. "/request?limit=75"
-	 * char *pcBuffer;			// Here the answer can be written
-	 * size_t uxBufferLength;	// Size of the buffer
-	 *
-	 */
-	extern size_t uxApplicationHTTPHandleRequestHook( const char *pcURLData, char *pcBuffer, size_t uxBufferLength );
-#endif /* ipconfigHTTP_HAS_HANDLE_REQUEST_HOOK */
-
-struct xSERVER_CONFIG
+typedef enum xSERVER_CONFIG_TYPE
 {
-	enum eSERVER_TYPE eType;		/* eSERVER_HTTP | eSERVER_FTP */
-	BaseType_t xPortNumber;			/* e.g. 80, 8080, 21 */
-	BaseType_t xBackLog;			/* e.g. 10, maximum number of connected TCP clients */
-	const char * const pcRootDir;	/* Treat this directory as the root directory */
-};
+  serverTYPE_HTTP = 1,
+  serverTYPE_TELNET = 2
+} ServerConfigType_t;
+
+typedef struct xSERVER_CONF
+{
+  ServerConfigType_t serverType;
+  BaseType_t xPortNumber;		/* e.g. 80, 8080, 21 */
+  BaseType_t xBackLog;			/* e.g. 10, maximum number of connected TCP clients */
+  FTCPWorkFunction workFn;
+  FTCPDeleteFunction deleteFn;
+  Socket_t xSocket;
+} ServerConfig_t;
+
 
 struct xTCP_SERVER;
 typedef struct xTCP_SERVER TCPServer_t;
 
-TCPServer_t *FreeRTOS_CreateTCPServer( const struct xSERVER_CONFIG *pxConfigs, BaseType_t xCount );
+TCPServer_t *getStaticTCPServer(ServerConfig_t config[], const BaseType_t numServers);
 void FreeRTOS_TCPServerWork( TCPServer_t *pxServer, TickType_t xBlockingTime );
 
 #if( ipconfigSUPPORT_SIGNALS != 0 )

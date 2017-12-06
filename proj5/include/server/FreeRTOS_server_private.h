@@ -62,6 +62,8 @@
 #ifndef FREERTOS_SERVER_PRIVATE_H
 #define	FREERTOS_SERVER_PRIVATE_H
 
+#include "FreeRTOS_TCP_server.h"
+
 #define FREERTOS_NO_SOCKET		NULL
 
 /* Each HTTP server has 1, at most 2 sockets */
@@ -80,11 +82,11 @@
  */
 
 #ifndef ipconfigTCP_COMMAND_BUFFER_SIZE
-	#define ipconfigTCP_COMMAND_BUFFER_SIZE	( 2048 )
+	#define ipconfigTCP_COMMAND_BUFFER_SIZE	( 512 )
 #endif
 
 #ifndef ipconfigTCP_FILE_BUFFER_SIZE
-	#define ipconfigTCP_FILE_BUFFER_SIZE	( 2048 )
+	#define ipconfigTCP_FILE_BUFFER_SIZE	( 512 )
 #endif
 
 typedef struct {
@@ -98,14 +100,10 @@ typedef struct {
 } FF_FindData_t;
 struct xTCP_CLIENT;
 
-typedef BaseType_t ( * FTCPWorkFunction ) ( struct xTCP_CLIENT * /* pxClient */ );
-typedef void ( * FTCPDeleteFunction ) ( struct xTCP_CLIENT * /* pxClient */ );
 
 #define	TCP_CLIENT_FIELDS \
-	enum eSERVER_TYPE eType; \
 	struct xTCP_SERVER *pxParent; \
 	Socket_t xSocket; \
-	const char *pcRootDir; \
 	FTCPWorkFunction fWorkFunction; \
 	FTCPDeleteFunction fDeleteFunction; \
 	struct xTCP_CLIENT *pxNextClient
@@ -198,29 +196,19 @@ void vFTPClientDelete( TCPClient_t *pxClient );
 BaseType_t xMakeAbsolute( struct xFTP_CLIENT *pxClient, char *pcBuffer, BaseType_t xBufferLength, const char *pcFileName );
 BaseType_t xMakeRelative( FTPClient_t *pxClient, char *pcBuffer, BaseType_t xBufferLength, const char *pcFileName );
 
+
 struct xTCP_SERVER
 {
 	SocketSet_t xSocketSet;
+  ServerConfig_t *config;
 	/* A buffer to receive and send TCP commands, either HTTP of FTP. */
 	char pcCommandBuffer[ ipconfigTCP_COMMAND_BUFFER_SIZE ];
 	/* A buffer to access the file system: read or write data. */
 	char pcFileBuffer[ ipconfigTCP_FILE_BUFFER_SIZE ];
 
-	#if( ipconfigUSE_FTP != 0 )
-		char pcNewDir[ ffconfigMAX_FILENAME ];
-	#endif
-	#if( ipconfigUSE_HTTP != 0 )
-		char pcContentsType[40];	/* Space for the msg: "text/javascript" */
-		char pcExtraContents[40];	/* Space for the msg: "Content-Length: 346500" */
-	#endif
 	BaseType_t xServerCount;
 	TCPClient_t *pxClients;
-	struct xSERVER
-	{
-		enum eSERVER_TYPE eType;		/* eSERVER_HTTP | eSERVER_FTP */
-		const char *pcRootDir;
-		Socket_t xSocket;
-	} xServers[ 1 ];
+
 };
 
 #endif /* FREERTOS_SERVER_PRIVATE_H */

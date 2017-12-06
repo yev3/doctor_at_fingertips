@@ -22,6 +22,8 @@
 #include "tasks/system.h"
 #include "hardware_port.h"
 #include "server/FreeRTOS_TCP_server.h"
+#include "FreeRTOS_IP_Private.h"
+#include "server/FreeRTOS_server_private.h"
 
 #define mainTCP_SERVER_TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 
@@ -55,10 +57,6 @@ FreeRTOSConfig.h as it is a demo application constant. */
 #define ipconnCLIENT_STACK_SIZE        ( configMINIMAL_STACK_SIZE * 2 )  /* Not used in the Windows port. */
 #define ipconnCLIENT_TASK_PRIORITY          ( tskIDLE_PRIORITY + 2 )
 
-/* Define a name that will be used for LLMNR and NBNS searches. */
-#define mainHOST_NAME        "doc"
-#define mainDEVICE_NICK_NAME "doc"
-
 /*
  * Network Configuration Parameters
  */
@@ -67,25 +65,6 @@ static const uint8_t ucNetMask[4] = { 255, 255, 255, 0 };
 static const uint8_t ucGatewayAddress[4] = { 192, 168, 1, 254 };
 static const uint8_t ucDNSServerAddress[4] = { 208, 67, 222, 222 };
 uint8_t ucMACAddress[8];
-
-/* Use by the pseudo random number generator. */
-static UBaseType_t ulNextRand;
-
-// Starts listening
-void StartTCPListeningTask(uint16_t usStackSize, UBaseType_t uxPriority);
-
-/*
- * Uses FreeRTOS+TCP to listen for incoming echo connections, creating a task
- * to handle each connection.
- */
-//static void prvConnectionListeningTask(void *pvParameters);
-
-/*
- * Created by the connection listening task to handle a single connection.
- */
-//static void prvServerConnectionInstance(void *pvParameters);
-
-/*-----------------------------------------------------------*/
 
 // Gets the network MAC
 extern void NetworkGetMAC(uint8_t *ucMACAddress);
@@ -136,31 +115,12 @@ void logNetworkConfig() {
 
 /*-----------------------------------------------------------*/
 
-///* Called by FreeRTOS+TCP when the network connects or disconnects.  Disconnect
-//events are only received if implemented in the MAC driver. */
-//void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent) {
-//  static bool tasksCreated = false;
-//
-//  if (eNetworkEvent == eNetworkUp) {
-//    /* Create the tasks that use the IP stack if they have not already been
-//    created. */
-//    if (!tasksCreated) {
-//      StartTCPListeningTask(ipconnCLIENT_STACK_SIZE,
-//        ipconnCLIENT_TASK_PRIORITY);
-//    }
-//    tasksCreated = pdTRUE;
-//    logNetworkConfig();
-//  }
-//}
-
-TaskHandle_t serverWorkTaskHandle = NULL;
+static TaskHandle_t serverWorkTaskHandle = NULL;
 
 /* Called by FreeRTOS+TCP when the network connects or disconnects.  Disconnect
 events are only received if implemented in the MAC driver. */
 void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
 {
-uint32_t ulIPAddress, ulNetMask, ulGatewayAddress, ulDNSServerAddress;
-char cBuffer[ 16 ];
 static BaseType_t xTasksAlreadyCreated = pdFALSE;
 
 	/* If the network has just come up...*/
@@ -183,33 +143,82 @@ static BaseType_t xTasksAlreadyCreated = pdFALSE;
 	}
 }
 
-void ipServerWork(void *pvParameters)
+BaseType_t telnetWork( TCPClient_t *pxTCPClient ) 
+{
+  static char recvBuf[100];     // Received command buffer and size
+  static const BaseType_t recvBufSize = sizeof(recvBuf);
+  static char respBuf[512];     // Command response buffer
+
+  Socket_t sock = (Socket_t)pxTCPClient->xSocket;
+
+  int32_t lSent;
+  int32_t lTotalSent;
+
+  BaseType_t xRc = FreeRTOS_recv(sock, recvBuf, recvBufSize, 0);
+
+  if (xRc > 0) {
+
+    CmdLineOutBuf_t outBuf = (CmdLineOutBuf_t) {
+      .buf = respBuf,
+      .capacity = sizeof(respBuf),
+      .len = 0
+    };
+
+    consumeCommandBuffer(recvBuf, xRc, &outBuf);
+
+    /* If there is data to send back */
+    if (outBuf.len > 0) {
+      lSent = 0;
+      lTotalSent = 0;
+
+      outBuf.buf[outBuf.capacity - 1] = '\0';
+      FreeRTOS_debug_printf(("Sending back:\n%s\n", outBuf.buf));
+
+      /* Call send() until all the data has been sent. */
+      while (lTotalSent < outBuf.len) {
+        lSent =
+          FreeRTOS_send(sock,
+                        outBuf.buf,
+                        outBuf.len - lTotalSent,
+                        0);
+        if (lSent <= 0) {
+          break;
+        }
+        lTotalSent += lSent;
+      }
+
+      if (lSent < 0) {
+        /* Socket closed? */
+        //break;
+      }
+    }
+  }
+
+  return xRc;
+}
+
+
+static ServerConfig_t serverConfig[] = {
+  {serverTYPE_HTTP, 80, 3, xHTTPClientWork, vHTTPClientDelete},
+  {serverTYPE_TELNET, 23, 2, telnetWork, vHTTPClientDelete},
+};
+
+void ipServerTask(void *pvParameters)
 {
   serverWorkTaskHandle = *(TaskHandle_t*)pvParameters;
 
   TCPServer_t *pxTCPServer = NULL;
-  const TickType_t xInitialBlockTime = pdMS_TO_TICKS(200UL);
-
-  /* A structure that defines the servers to be created.  Which servers are
-  included in the structure depends on the mainCREATE_HTTP_SERVER and
-  mainCREATE_FTP_SERVER settings at the top of this file. */
-  static const struct xSERVER_CONFIG xServerConfiguration[] =
-  {
-    /* Server type,		port number,	backlog, 	root dir. */
-    { eSERVER_HTTP, 	10080, 			12, 		"" },
-  };
-
+  const TickType_t xInitialBlockTime = portMAX_DELAY;
+  //const TickType_t xInitialBlockTime = pdMS_TO_TICKS(200UL);
 
   /* Wait until the network is up before creating the servers.  The
   notification is given from the network event hook. */
   ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-  /* Create the servers defined by the xServerConfiguration array above. */
-  pxTCPServer = FreeRTOS_CreateTCPServer(xServerConfiguration, sizeof(xServerConfiguration) / sizeof(xServerConfiguration[0]));
-  configASSERT(pxTCPServer);
+  // Initialize the server
+  pxTCPServer = getStaticTCPServer(serverConfig, ARRAY_SIZE(serverConfig));
 
-  for (;; )
-  {
+  for (;;) {
     FreeRTOS_TCPServerWork(pxTCPServer, xInitialBlockTime);
   }
 }
@@ -217,122 +226,10 @@ void ipServerWork(void *pvParameters)
 
 /*-----------------------------------------------------------*/
 
-#if(ipconfigUSE_LLMNR != 0) || (ipconfigUSE_NBNS != 0) || (ipconfigDHCP_REGISTER_HOSTNAME == 1)
-
-const char *pcApplicationHostnameHook(void) {
-  /* Assign the name "FreeRTOS" to this network node.  This function will
-  be called during the DHCP: the machine will be registered with an IP
-  address plus this name. */
-  return mainHOST_NAME;
-}
-
-#endif
-/*-----------------------------------------------------------*/
-
 
 /* Stores the stack size passed into vStartSimpleTCPServerTasks() so it can be
 reused when the server listening task creates tasks to handle connections. */
 static uint16_t usUsedStackSize = 0;
-
-
-
-
-
-
-/*-----------------------------------------------------------*/
-
-//void _StartTCPListeningTask(uint16_t usStackSize, UBaseType_t uxPriority) {
-//
-//  FreeRTOS_debug_printf(("Start ServerListener\n"));
-//  /* Create the TCP echo server. */
-//  xTaskCreate(prvConnectionListeningTask,
-//              "ServerListener",
-//              usStackSize,
-//              NULL,
-//              uxPriority + 1,
-//              NULL);
-//
-//  /* Remember the requested stack size so it can be re-used by the server
-//  listening task when it creates tasks to handle connections. */
-//  usUsedStackSize = usStackSize;
-//}
-//
-/*-----------------------------------------------------------*/
-
-//static void _prvConnectionListeningTask(void *pvParameters) {
-//  struct freertos_sockaddr xClient, xBindAddress;
-//  Socket_t xListeningSocket, xConnectedSocket;
-//  socklen_t xSize = sizeof(xClient);
-//  static const TickType_t xReceiveTimeOut = portMAX_DELAY;
-//  const BaseType_t xBacklog = 20;
-//
-//#if(ipconfigUSE_TCP_WIN == 1)
-//  WinProperties_t xWinProps;
-//
-//  /* Fill in the buffer and window sizes that will be used by the socket. */
-//  xWinProps.lTxBufSize = ipconfigTCP_TX_BUFFER_LENGTH;
-//  xWinProps.lTxWinSize = configECHO_SERVER_TX_WINDOW_SIZE;
-//  xWinProps.lRxBufSize = ipconfigTCP_RX_BUFFER_LENGTH;
-//  xWinProps.lRxWinSize = configECHO_SERVER_RX_WINDOW_SIZE;
-//#endif /* ipconfigUSE_TCP_WIN */
-//
-//  /* Just to prevent compiler warnings. */
-//  (void) pvParameters;
-//
-//  /* Attempt to open the socket. */
-//  xListeningSocket = FreeRTOS_socket(FREERTOS_AF_INET,
-//                                     FREERTOS_SOCK_STREAM,
-//                                     FREERTOS_IPPROTO_TCP);
-//  configASSERT(xListeningSocket != FREERTOS_INVALID_SOCKET);
-//
-//  /* Set a time out so accept() will just wait for a connection. */
-//  FreeRTOS_setsockopt(xListeningSocket,
-//                      0,
-//                      FREERTOS_SO_RCVTIMEO,
-//                      &xReceiveTimeOut,
-//                      sizeof(xReceiveTimeOut));
-//
-//  /* Set the window and buffer sizes. */
-//#if(ipconfigUSE_TCP_WIN == 1)
-//  {
-//    FreeRTOS_setsockopt(xListeningSocket,
-//                        0,
-//                        FREERTOS_SO_WIN_PROPERTIES,
-//                        (void *) &xWinProps,
-//                        sizeof(xWinProps));
-//  }
-//#endif /* ipconfigUSE_TCP_WIN */
-//
-//  /* Bind the socket to the port that the client task will send to, then
-//  listen for incoming connections. */
-//  xBindAddress.sin_port = ipconnLISTEN_PORT;
-//  xBindAddress.sin_port = FreeRTOS_htons(xBindAddress.sin_port);
-//  FreeRTOS_bind(xListeningSocket, &xBindAddress, sizeof(xBindAddress));
-//  FreeRTOS_listen(xListeningSocket, xBacklog);
-//
-//  for (;;) {
-//    /* Wait for a client to connect. */
-//    xConnectedSocket = FreeRTOS_accept(xListeningSocket, &xClient, &xSize);
-//    configASSERT(xConnectedSocket != FREERTOS_INVALID_SOCKET);
-//
-//    FreeRTOS_debug_printf(("Accepted connection, creating task..\n"));
-//
-//    /* Spawn a task to handle the connection. */
-//    xTaskCreate(prvServerConnectionInstance,
-//                "CommandInterpreterServer",
-//                usUsedStackSize,
-//                (void *) xConnectedSocket,
-//                tskIDLE_PRIORITY+3,
-//                NULL);
-//  }
-//}
-/*-----------------------------------------------------------*/
-
-static int connInstanceCount = 0;
-
-
-////////////////////////////////////////////////////////////////////////////////
-
 
 static void _prvServerConnectionInstance(void *pvParameters) {
   static const TickType_t xReceiveTimeOut = pdMS_TO_TICKS(5000);
@@ -358,9 +255,7 @@ static void _prvServerConnectionInstance(void *pvParameters) {
 
   Socket_t xConnectedSocket = (Socket_t) pvParameters;
 
-  int myTaskInstNum = ++connInstanceCount;
-
-  FreeRTOS_debug_printf(("#%d: Running listening task ..\n", myTaskInstNum));
+  FreeRTOS_debug_printf(("Running new listening task ..\n"));
 
   FreeRTOS_setsockopt(xConnectedSocket, 0, FREERTOS_SO_RCVTIMEO,
                       &xReceiveTimeOut, sizeof(xReceiveTimeOut));
@@ -370,13 +265,12 @@ static void _prvServerConnectionInstance(void *pvParameters) {
 
   for (;;) {
 
-
     // Receive command line
     while (!(lRecvSize =
                FreeRTOS_recv(xConnectedSocket, recvBuf, recvBufSize, 0))) {}
 
     if (lRecvSize < 0) {
-      FreeRTOS_debug_printf(("#%d: Receive size invalid, timeout?\n", myTaskInstNum));
+      FreeRTOS_debug_printf(("Receive size invalid, timeout?\n"));
       /* Socket closed? */
       break;
     }
@@ -408,7 +302,7 @@ static void _prvServerConnectionInstance(void *pvParameters) {
     }
   }
 
-  FreeRTOS_debug_printf(("#%d: Shutting down listening task ..\n", myTaskInstNum));
+  FreeRTOS_debug_printf(("Shutting down listening task ..\n"));
 
   /* Initiate a shutdown in case it has not already been initiated. */
   FreeRTOS_shutdown(xConnectedSocket, FREERTOS_SHUT_RDWR);

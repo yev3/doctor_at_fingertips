@@ -272,6 +272,7 @@ HTTPClient_t *pxClient = ( HTTPClient_t * ) pxTCPClient;
     } else {
       // Some other command!
       FreeRTOS_printf(("Unknown HTTP command: %s\n", pcBuffer));
+
       xRc = -1; // return error
     }
 

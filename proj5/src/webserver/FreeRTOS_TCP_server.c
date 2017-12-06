@@ -70,6 +70,7 @@
 #include "FreeRTOS_Sockets.h"
 #include "server/FreeRTOS_TCP_server.h"
 #include "server/FreeRTOS_server_private.h"
+#include "FreeRTOS_IP_Private.h"
 
 /* Remove the entire file if TCP is not being used. */
 #if( ipconfigUSE_TCP == 1 )
@@ -79,124 +80,82 @@
 #endif
 
 
-static void prvReceiveNewClient( TCPServer_t *pxServer, BaseType_t xIndex, Socket_t xNexSocket );
-static char *strnew( const char *pcString );
-/* Remove slashes at the end of a path. */
-static void prvRemoveSlash( char *pcDir );
+static void prvReceiveNewClient(TCPServer_t *pxServer, ServerConfig_t *config, Socket_t xNexSocket);
 
-TCPServer_t *FreeRTOS_CreateTCPServer( const struct xSERVER_CONFIG *pxConfigs, BaseType_t numServers )
+SocketSet_t getStaticSocketSet( void )
 {
-TCPServer_t *pxServer;
-SocketSet_t xSocketSet;
-
-	/* Create a new server.
-	xPort / xPortAlt : Make the service available on 1 or 2 public port numbers. */
-	xSocketSet = FreeRTOS_CreateSocketSet();
-
-	if( xSocketSet != NULL )
-	{
-	BaseType_t xSize;
-
-		xSize = sizeof( *pxServer ) - sizeof( pxServer->xServers ) + numServers * sizeof( pxServer->xServers[ 0 ] );
-
-		pxServer = ( TCPServer_t * ) pvPortMallocLarge( xSize );
-		if( pxServer != NULL )
-		{
-		struct freertos_sockaddr xAddress;
-		BaseType_t xNoTimeout = 0;
-		BaseType_t xIndex;
-
-			memset( pxServer, '\0', xSize );
-			pxServer->xServerCount = numServers;
-			pxServer->xSocketSet = xSocketSet;
-
-			for( xIndex = 0; xIndex < numServers; xIndex++ )
-			{
-			BaseType_t xPortNumber = pxConfigs[ xIndex ].xPortNumber;
-
-				if( xPortNumber > 0 )
-				{
-				Socket_t xSocket;
-
-					xSocket = FreeRTOS_socket( FREERTOS_AF_INET, FREERTOS_SOCK_STREAM, FREERTOS_IPPROTO_TCP );
-					FreeRTOS_printf( ( "TCP socket on port %d\n", ( int )xPortNumber ) );
-
-					if( xSocket != FREERTOS_NO_SOCKET )
-					{
-						xAddress.sin_addr = FreeRTOS_GetIPAddress(); // Single NIC, currently not used
-						xAddress.sin_port = FreeRTOS_htons( xPortNumber );
-
-						FreeRTOS_bind( xSocket, &xAddress, sizeof( xAddress ) );
-						FreeRTOS_listen( xSocket, pxConfigs[ xIndex ].xBackLog );
-
-						FreeRTOS_setsockopt( xSocket, 0, FREERTOS_SO_RCVTIMEO, ( void * ) &xNoTimeout, sizeof( BaseType_t ) );
-						FreeRTOS_setsockopt( xSocket, 0, FREERTOS_SO_SNDTIMEO, ( void * ) &xNoTimeout, sizeof( BaseType_t ) );
-
-						#if( ipconfigHTTP_RX_BUFSIZE > 0 )
-						{
-							if( pxConfigs[ xIndex ].eType == eSERVER_HTTP )
-							{
-							WinProperties_t xWinProps;
-
-								memset( &xWinProps, '\0', sizeof( xWinProps ) );
-								/* The parent socket itself won't get connected.  The properties below
-								will be inherited by each new child socket. */
-								xWinProps.lTxBufSize = ipconfigHTTP_TX_BUFSIZE;
-								xWinProps.lTxWinSize = ipconfigHTTP_TX_WINSIZE;
-								xWinProps.lRxBufSize = ipconfigHTTP_RX_BUFSIZE;
-								xWinProps.lRxWinSize = ipconfigHTTP_RX_WINSIZE;
-
-								/* Set the window and buffer sizes. */
-								FreeRTOS_setsockopt( xSocket, 0, FREERTOS_SO_WIN_PROPERTIES, ( void * ) &xWinProps,	sizeof( xWinProps ) );
-							}
-						}
-						#endif
-
-						FreeRTOS_FD_SET( xSocket, xSocketSet, eSELECT_READ|eSELECT_EXCEPT );
-						pxServer->xServers[ xIndex ].xSocket = xSocket;
-						pxServer->xServers[ xIndex ].eType = pxConfigs[ xIndex ].eType;
-						pxServer->xServers[ xIndex ].pcRootDir = strnew( pxConfigs[ xIndex ].pcRootDir );
-						prvRemoveSlash( ( char * ) pxServer->xServers[ xIndex ].pcRootDir );
-					}
-				}
-			}
-		}
-		else
-		{
-			/* Could not allocate the server, delete the socket set */
-			FreeRTOS_DeleteSocketSet( xSocketSet );
-		}
-	}
-	else
-	{
-		/* Could not create a socket set, return NULL */
-		pxServer = NULL;
-	}
-
-	return pxServer;
+  static SocketSelect_t pxSocketSet = { 0 };
+  static StaticEventGroup_t eventGroup = { 0 };
+  pxSocketSet.xSelectGroup = xEventGroupCreateStatic(&eventGroup);
+  return (SocketSet_t *) &pxSocketSet;
 }
+
+TCPServer_t *getStaticTCPServer(ServerConfig_t config[], const BaseType_t numServers) {
+  static TCPServer_t server = {0};
+  struct freertos_sockaddr xAddress;
+  BaseType_t xNoTimeout = 0;
+
+  server.xServerCount = numServers;
+  server.xSocketSet = getStaticSocketSet();
+
+  for (BaseType_t i = 0; i < numServers; ++i) {
+    BaseType_t port = config[i].xPortNumber;
+    if (port > 0) {
+
+      Socket_t xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
+                                         FREERTOS_IPPROTO_TCP);
+      FreeRTOS_printf( ( "TCP socket on port %d\n", ( int )port ) );
+
+      if (xSocket != FREERTOS_NO_SOCKET) {
+        xAddress.sin_addr = FreeRTOS_GetIPAddress();
+        // Single NIC, currently not used
+        xAddress.sin_port = FreeRTOS_htons( port );
+
+        FreeRTOS_bind(xSocket, &xAddress, sizeof(xAddress));
+        FreeRTOS_listen(xSocket, config[i].xBackLog);
+
+        FreeRTOS_setsockopt(xSocket, 0, FREERTOS_SO_RCVTIMEO,
+                            (void *)&xNoTimeout, sizeof( BaseType_t));
+        FreeRTOS_setsockopt(xSocket, 0, FREERTOS_SO_SNDTIMEO,
+                            (void *)&xNoTimeout, sizeof( BaseType_t));
+
+        if (serverTYPE_HTTP == config[i].serverType) {
+          WinProperties_t xWinProps;
+
+          memset(&xWinProps, '\0', sizeof(xWinProps));
+          /* The parent socket itself won't get connected.  The properties below
+          will be inherited by each new child socket. */
+          xWinProps.lTxBufSize = ipconfigHTTP_TX_BUFSIZE;
+          xWinProps.lTxWinSize = ipconfigHTTP_TX_WINSIZE;
+          xWinProps.lRxBufSize = ipconfigHTTP_RX_BUFSIZE;
+          xWinProps.lRxWinSize = ipconfigHTTP_RX_WINSIZE;
+
+          /* Set the window and buffer sizes. */
+          FreeRTOS_setsockopt(xSocket, 0, FREERTOS_SO_WIN_PROPERTIES,
+                              (void *)&xWinProps, sizeof(xWinProps));
+        }
+
+        config[i].xSocket = xSocket;
+        FreeRTOS_FD_SET(xSocket, server.xSocketSet, eSELECT_READ | eSELECT_EXCEPT);
+      }
+    }
+  }
+  server.config = config;
+  return &server;
+}
+
 /*-----------------------------------------------------------*/
 
-static void prvReceiveNewClient( TCPServer_t *pxServer, BaseType_t xIndex, Socket_t xNexSocket )
+static void prvReceiveNewClient( TCPServer_t *pxServer, ServerConfig_t *config, Socket_t xNexSocket )
 {
 TCPClient_t *pxClient = NULL;
 BaseType_t xSize = 0;
-FTCPWorkFunction fWorkFunc = NULL;
-FTCPDeleteFunction fDeleteFunc = NULL;
 const char *pcType = "Unknown";
 
 	/*_RB_ Can the work and delete functions be part of the xSERVER_CONFIG structure
 	becomes generic, with no pre-processing required? */
-	{
-		if( pxServer->xServers[ xIndex ].eType == eSERVER_HTTP )
-		{
-			xSize = sizeof( HTTPClient_t );
-			fWorkFunc = xHTTPClientWork;
-			fDeleteFunc = vHTTPClientDelete;
-			pcType = "HTTP";
-		}
-	}
-
+  xSize = sizeof( HTTPClient_t );
+  pcType = "Active";
 
 	/* Malloc enough space for a new HTTP-client */
 	if( xSize )
@@ -209,13 +168,11 @@ const char *pcType = "Unknown";
 		memset( pxClient, '\0', xSize );
 
 		/* Put the new client in front of the list. */
-		pxClient->eType = pxServer->xServers[ xIndex ].eType;
-		pxClient->pcRootDir = pxServer->xServers[ xIndex ].pcRootDir;
 		pxClient->pxParent = pxServer;
 		pxClient->xSocket = xNexSocket;
 		pxClient->pxNextClient = pxServer->pxClients;
-		pxClient->fWorkFunction = fWorkFunc;
-		pxClient->fDeleteFunction = fDeleteFunc;
+		pxClient->fWorkFunction = config->workFn;
+		pxClient->fDeleteFunction = config->deleteFn;
 		pxServer->pxClients = pxClient;
 
 		FreeRTOS_FD_SET( xNexSocket, pxServer->xSocketSet, eSELECT_READ|eSELECT_EXCEPT );
@@ -236,31 +193,30 @@ const char *pcType = "Unknown";
 void FreeRTOS_TCPServerWork( TCPServer_t *pxServer, TickType_t xBlockingTime )
 {
 TCPClient_t **ppxClient;
-BaseType_t xIndex;
-BaseType_t xRc;
+  BaseType_t xRc;
 
 	/* Let the server do one working cycle */
 	xRc = FreeRTOS_select( pxServer->xSocketSet, xBlockingTime );
 
 	if( xRc != 0 )
 	{
-		for( xIndex = 0; xIndex < pxServer->xServerCount; xIndex++ )
+		for( BaseType_t i = 0; i < pxServer->xServerCount; i++ )
 		{
-		struct freertos_sockaddr xAddress;
-		Socket_t xNexSocket;
-		socklen_t xSocketLength;
+      struct freertos_sockaddr xAddress;
+      Socket_t sock = pxServer->config[i].xSocket;    // Current socket
+      Socket_t xNexSocket;
+      socklen_t xSocketLength;
 
-			if( pxServer->xServers[ xIndex ].xSocket == FREERTOS_NO_SOCKET )
-			{
+			if( sock == FREERTOS_NO_SOCKET ) {
 				continue;
 			}
 
 			xSocketLength = sizeof( xAddress );
-			xNexSocket = FreeRTOS_accept( pxServer->xServers[ xIndex ].xSocket, &xAddress, &xSocketLength);
+			xNexSocket = FreeRTOS_accept( sock, &xAddress, &xSocketLength);
 
 			if( ( xNexSocket != FREERTOS_NO_SOCKET ) && ( xNexSocket != FREERTOS_INVALID_SOCKET ) )
 			{
-				prvReceiveNewClient( pxServer, xIndex, xNexSocket );
+				prvReceiveNewClient( pxServer, &pxServer->config[i], xNexSocket );
 			}
 		}
 	}
@@ -291,76 +247,5 @@ BaseType_t xRc;
 }
 /*-----------------------------------------------------------*/
 
-static char *strnew( const char *pcString )
-{
-BaseType_t xLength;
-char *pxBuffer;
-
-	xLength = strlen( pcString ) + 1;
-	pxBuffer = ( char * ) pvPortMalloc( xLength );
-	if( pxBuffer != NULL )
-	{
-		memcpy( pxBuffer, pcString, xLength );
-	}
-
-	return pxBuffer;
-}
-/*-----------------------------------------------------------*/
-
-static void prvRemoveSlash( char *pcDir )
-{
-BaseType_t xLength = strlen( pcDir );
-
-	while( ( xLength > 0 ) && ( pcDir[ xLength - 1 ] == '/' ) )
-	{
-		pcDir[ --xLength ] = '\0';
-	}
-}
-/*-----------------------------------------------------------*/
-
-
-	/* FreeRTOS_TCPServerWork() calls select().
-	The two functions below provide a possibility to interrupt
-	the call to select(). After the interruption, resume
-	by calling FreeRTOS_TCPServerWork() again. */
-	BaseType_t FreeRTOS_TCPServerSignal( TCPServer_t *pxServer )
-	{
-	BaseType_t xIndex;
-	BaseType_t xResult = pdFALSE;
-		for( xIndex = 0; xIndex < pxServer->xServerCount; xIndex++ )
-		{
-			if( pxServer->xServers[ xIndex ].xSocket != FREERTOS_NO_SOCKET )
-			{
-				FreeRTOS_SignalSocket( pxServer->xServers[ xIndex ].xSocket );
-				xResult = pdTRUE;
-				break;
-			}
-		}
-
-		return xResult;
-	}
-
-/*-----------------------------------------------------------*/
-
-
-	/* Same as above: this function may be called from an ISR,
-	for instance a GPIO interrupt. */
-	BaseType_t FreeRTOS_TCPServerSignalFromISR( TCPServer_t *pxServer, BaseType_t *pxHigherPriorityTaskWoken )
-	{
-	BaseType_t xIndex;
-	BaseType_t xResult = pdFALSE;
-		for( xIndex = 0; xIndex < pxServer->xServerCount; xIndex++ )
-		{
-			if( pxServer->xServers[ xIndex ].xSocket != FREERTOS_NO_SOCKET )
-			{
-				FreeRTOS_SignalSocketFromISR( pxServer->xServers[ xIndex ].xSocket, pxHigherPriorityTaskWoken );
-				xResult = pdTRUE;
-				break;
-			}
-		}
-
-		return xResult;
-	}
-/*-----------------------------------------------------------*/
 
 #endif /* ipconfigUSE_TCP != 1 */

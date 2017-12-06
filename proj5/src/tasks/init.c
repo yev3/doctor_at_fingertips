@@ -120,7 +120,7 @@ extern void serial_comms(void *arg);
 extern void measureEKG(void *arg);
 extern void computeEKG(void *arg);
 extern void cmdDispatch(void *arg);
-extern void ipServerWork(void *arg);
+extern void ipServerTask(void *arg);
 
 /*****************************************************************************
  * Static task allocation data and routines
@@ -157,7 +157,7 @@ TE(sysTCB_SERIAL    ,serial_comms, &serialData,    sysPRI_SERL,  sysSTK_SERL),
 TE(sysTCB_MEAS_EKG  ,measureEKG,   &measEKGData,   sysPRI_MEKG,  sysSTK_MEKG),
 TE(sysTCB_COMP_EKG  ,computeEKG,   &compEKGData,   sysPRI_CEKG,  sysSTK_CEKG),
 TE(sysTCB_CMD_PARSE ,cmdDispatch,  &cmdDispQueue,  sysPRI_PARSR, sysSTK_PARSR),
-TE(sysTCB_SERVER    ,ipServerWork, serverData,     sysPRI_SERVR, sysSTK_SERVR),
+TE(sysTCB_SERVER    ,ipServerTask, serverData,     sysPRI_SERVR, sysSTK_SERVR),
 };
 
 #undef TE
