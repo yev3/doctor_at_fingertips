@@ -16,12 +16,8 @@
 #include "server/FreeRTOS_server_private.h"
 #include "server/server.h"
 
-// Main page data
-
 // To make the code more readable
 #define pcCOMMAND_BUFFER	pxClient->pxParent->pcCommandBuffer
-
-
 
 /**
  * \brief Handles an HTTP GET command from the client
@@ -48,8 +44,6 @@ HTTPClient_t *pxClient = ( HTTPClient_t * ) pxTCPClient;
 }
 /*-----------------------------------------------------------*/
 
-
-
 /**
  * \brief 
  * \param pxClient 
@@ -65,14 +59,6 @@ BaseType_t xRc = 0;
 	if( pxClient->bits.bReplySent == pdFALSE_UNSIGNED )
 	{
 		pxClient->bits.bReplySent = pdTRUE_UNSIGNED;
-
-    // Note: do not send headers because the file already includes them
-		//strcpy( pxClient->pxParent->pcContentsType, pcGetContentsType( pxClient->pcCurrentFilename ) );
-		//snprintf( pxClient->pxParent->pcExtraContents, sizeof( pxClient->pxParent->pcExtraContents ),
-		//	"Content-Length: %d\r\n", ( int ) pxClient->uxBytesLeft );
-
-		///* "Requested file action OK". */
-		//xRc = prvSendReply( pxClient, WEB_REPLY_OK );
 	}
 
 	if( xRc >= 0 ) do
@@ -115,12 +101,6 @@ BaseType_t xRc = 0;
 
     // Send back 0 to indicate finished reading file 
     xRc = 0;
-
-    /*
-     * TODO:
-     */
-
-		//prvFileClose( pxClient );
 	}
 	else
 	{
