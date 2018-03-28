@@ -48,11 +48,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <IncludePath>$(ProjectDir)include;$(ProjectDir)..\common\include;$(ProjectDir)..\common\FreeRTOS\Source\portable\MSVC-MingW;$(ProjectDir)..\common\FreeRTOS\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\WinPCap;$(ProjectDir)..\common\curseslib\include;$(ProjectDir)..\common\SecondConsoleLogger\ConsoleLoggerLib;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include;$(ProjectDir)common\include;$(ProjectDir)common\FreeRTOS\Source\portable\MSVC-MingW;$(ProjectDir)common\FreeRTOS\Source\include;$(ProjectDir)common\FreeRTOS-Plus\Source\include;$(ProjectDir)common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include;$(ProjectDir)common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC;$(ProjectDir)common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\WinPCap;$(ProjectDir)common\curseslib\include;$(ProjectDir)common\SecondConsoleLogger\ConsoleLoggerLib;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\WinPCap;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <IncludePath>$(ProjectDir)include;$(ProjectDir)..\common\include;$(ProjectDir)..\common\FreeRTOS\Source\portable\MSVC-MingW;$(ProjectDir)..\common\FreeRTOS\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC;$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\WinPCap;$(ProjectDir)..\common\curseslib\include;$(ProjectDir)..\common\SecondConsoleLogger\ConsoleLoggerLib;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include;$(ProjectDir)common\include;$(ProjectDir)common\FreeRTOS\Source\portable\MSVC-MingW;$(ProjectDir)common\FreeRTOS\Source\include;$(ProjectDir)common\FreeRTOS-Plus\Source\include;$(ProjectDir)common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\include;$(ProjectDir)common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\Compiler\MSVC;$(ProjectDir)common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\WinPCap;$(ProjectDir)common\curseslib\include;$(ProjectDir)common\SecondConsoleLogger\ConsoleLoggerLib;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\WinPCap;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -93,7 +95,8 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalDependencies>wpcap.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\common\FreeRTOS-Plus\Source\FreeRTOS-Plus-TCP\portable\WinPCap</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
       <Profile>false</Profile>
     </Link>
     <Bscmake>
@@ -220,10 +223,10 @@
     <ClInclude Include="include\server\server.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\common\curseslib\ncurses.vcxproj">
+    <ProjectReference Include="common\curseslib\ncurses.vcxproj">
       <Project>{2e8c2a75-a3da-4dd5-9a0a-3cb858da12a2}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\common\SecondConsoleLogger\ConsoleLoggerLib\ConsoleLoggerLib.vcxproj">
+    <ProjectReference Include="common\SecondConsoleLogger\ConsoleLoggerLib\ConsoleLoggerLib.vcxproj">
       <Project>{a0af80c9-20be-4814-888c-9d78677f32f7}</Project>
     </ProjectReference>
     <ProjectReference Include="win32RTOS\win32RTOS-proj5.vcxproj">
